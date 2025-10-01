@@ -1,121 +1,187 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Notepad</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
-    
-    <style>
-        /* CSS styles are embedded here */
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f4f7f9;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            color: #333;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modern Notepad</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f4f7f9;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: #333;
+      transition: background 0.3s, color 0.3s;
+    }
 
-        .container {
-            width: 90%;
-            max-width: 800px;
-            height: 80vh;
-            display: flex;
-            flex-direction: column;
-            background-color: #ffffff;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            padding: 2rem;
-        }
+    .container {
+      width: 90%;
+      max-width: 900px;
+      height: 85vh;
+      display: flex;
+      flex-direction: column;
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+      padding: 1rem 1.5rem;
+    }
 
-        header {
-            text-align: center;
-            margin-bottom: 1.5rem;
-            border-bottom: 1px solid #e0e0e0;
-            padding-bottom: 1rem;
-        }
+    header {
+      text-align: center;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid #e0e0e0;
+      padding-bottom: 0.5rem;
+    }
 
-        h1 {
-            margin: 0;
-            color: #2c3e50;
-        }
+    h1 {
+      margin: 0;
+      font-size: 1.8rem;
+      color: #2c3e50;
+    }
 
-        p {
-            color: #7f8c8d;
-        }
+    p {
+      color: #7f8c8d;
+      font-size: 0.9rem;
+    }
 
-        #notepad {
-            flex-grow: 1;
-            border: 1px solid #dcdfe6;
-            border-radius: 6px;
-            padding: 1rem;
-            font-size: 1rem;
-            line-height: 1.6;
-            resize: none;
-            outline: none;
-            transition: border-color 0.3s;
-        }
+    .toolbar {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 1rem;
+    }
 
-        #notepad:focus {
-            border-color: #4a90e2;
-        }
+    .toolbar button {
+      padding: 0.6rem 1.2rem;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
 
-        #clearBtn {
-            margin-top: 1rem;
-            padding: 0.75rem 1.5rem;
-            border: none;
-            background-color: #e74c3c;
-            color: white;
-            font-size: 1rem;
-            font-weight: 500;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
+    .save { background: #27ae60; color: white; }
+    .save:hover { background: #1e8449; }
 
-        #clearBtn:hover {
-            background-color: #c0392b;
-        }
-    </style>
+    .download { background: #3498db; color: white; }
+    .download:hover { background: #2c80b4; }
+
+    .clear { background: #e74c3c; color: white; }
+    .clear:hover { background: #c0392b; }
+
+    .toggle { background: #8e44ad; color: white; }
+    .toggle:hover { background: #71368a; }
+
+    #notepad {
+      flex-grow: 1;
+      border: 1px solid #dcdfe6;
+      border-radius: 8px;
+      padding: 1rem;
+      font-size: 1rem;
+      line-height: 1.6;
+      resize: none;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+
+    #notepad:focus {
+      border-color: #4a90e2;
+    }
+
+    /* Dark Mode */
+    body.dark {
+      background-color: #2c3e50;
+      color: #ecf0f1;
+    }
+
+    body.dark .container {
+      background-color: #34495e;
+      color: #ecf0f1;
+    }
+
+    body.dark #notepad {
+      background: #2c3e50;
+      color: #ecf0f1;
+      border-color: #555;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Online Notepad</h1>
-            <p>Your notes are saved automatically.</p>
-        </header>
-        <textarea id="notepad" placeholder="Start writing..."></textarea>
-        <button id="clearBtn">Clear Note</button>
+  <div class="container">
+    <header>
+      <h1>📝 Modern Notepad</h1>
+      <p>Your notes are auto-saved locally</p>
+    </header>
+
+    <div class="toolbar">
+      <button class="save">💾 Save</button>
+      <button class="download">⬇️ Download</button>
+      <button class="clear">🗑️ Clear</button>
+      <button class="toggle">🌙 Toggle Dark Mode</button>
     </div>
-    
-    <script>
-        // JavaScript logic is embedded here
-        const notepad = document.getElementById('notepad');
-        const clearBtn = document.getElementById('clearBtn');
 
-        // Load the saved note from localStorage when the page loads
-        window.addEventListener('load', () => {
-            const savedNote = localStorage.getItem('userNote');
-            if (savedNote) {
-                notepad.value = savedNote;
-            }
-        });
+    <textarea id="notepad" placeholder="Start writing..."></textarea>
+  </div>
 
-        // Save the note to localStorage whenever the user types
-        notepad.addEventListener('input', () => {
-            localStorage.setItem('userNote', notepad.value);
-        });
+  <script>
+    const notepad = document.getElementById('notepad');
+    const saveBtn = document.querySelector('.save');
+    const downloadBtn = document.querySelector('.download');
+    const clearBtn = document.querySelector('.clear');
+    const toggleBtn = document.querySelector('.toggle');
 
-        // Clear the notepad and localStorage when the button is clicked
-        clearBtn.addEventListener('click', () => {
-            notepad.value = ''; // Clear the textarea
-            localStorage.removeItem('userNote'); // Remove the item from storage
-        });
-    </script>
+    // Load saved note
+    window.addEventListener('load', () => {
+      const savedNote = localStorage.getItem('userNote');
+      if (savedNote) notepad.value = savedNote;
+    });
+
+    // Save note manually
+    saveBtn.addEventListener('click', () => {
+      localStorage.setItem('userNote', notepad.value);
+      alert('✅ Note saved successfully!');
+    });
+
+    // Auto-save while typing
+    notepad.addEventListener('input', () => {
+      localStorage.setItem('userNote', notepad.value);
+    });
+
+    // Clear note
+    clearBtn.addEventListener('click', () => {
+      if (confirm("Are you sure you want to clear the note?")) {
+        notepad.value = '';
+        localStorage.removeItem('userNote');
+      }
+    });
+
+    // Download note
+    downloadBtn.addEventListener('click', () => {
+      const blob = new Blob([notepad.value], { type: "text/plain" });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = "note.txt";
+      link.click();
+    });
+
+    // Dark mode toggle
+    toggleBtn.addEventListener('click', () => {
+      document.body.classList.toggle('dark');
+    });
+
+    // Keyboard shortcut (Ctrl+S to save)
+    document.addEventListener('keydown', (e) => {
+      if (e.ctrlKey && e.key === 's') {
+        e.preventDefault();
+        localStorage.setItem('userNote', notepad.value);
+        alert('💾 Note saved with Ctrl+S!');
+      }
+    });
+  </script>
 </body>
 </html>
