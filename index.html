@@ -9,7 +9,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
     
     <style>
-        /* CSS styles are embedded here */
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f4f7f9;
@@ -65,11 +64,15 @@
             border-color: #4a90e2;
         }
 
-        #clearBtn {
+        .button-container {
             margin-top: 1rem;
+            display: flex;
+            gap: 1rem;
+        }
+
+        #clearBtn, #saveBtn {
             padding: 0.75rem 1.5rem;
             border: none;
-            background-color: #e74c3c;
             color: white;
             font-size: 1rem;
             font-weight: 500;
@@ -78,8 +81,33 @@
             transition: background-color 0.3s;
         }
 
+        #clearBtn {
+            background-color: #e74c3c;
+        }
+
         #clearBtn:hover {
             background-color: #c0392b;
+        }
+
+        #saveBtn {
+            background-color: #2ecc71;
+        }
+
+        #saveBtn:hover {
+            background-color: #27ae60;
+        }
+
+        #wordCount {
+            margin-top: 0.5rem;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+
+        #saveMessage {
+            margin-top: 0.5rem;
+            color: #2ecc71;
+            font-size: 0.9rem;
+            display: none;
         }
     </style>
 </head>
@@ -90,13 +118,27 @@
             <p>Your notes are saved automatically.</p>
         </header>
         <textarea id="notepad" placeholder="Start writing..."></textarea>
-        <button id="clearBtn">Clear Note</button>
+        <div id="wordCount">Word count: 0</div>
+        <div class="button-container">
+            <button id="saveBtn">Save Note</button>
+            <button id="clearBtn">Clear Note</button>
+        </div>
+        <div id="saveMessage">Note saved successfully!</div>
     </div>
     
     <script>
-        // JavaScript logic is embedded here
         const notepad = document.getElementById('notepad');
         const clearBtn = document.getElementById('clearBtn');
+        const saveBtn = document.getElementById('saveBtn');
+        const wordCountDisplay = document.getElementById('wordCount');
+        const saveMessage = document.getElementById('saveMessage');
+
+        // Function to update word count
+        function updateWordCount() {
+            const text = notepad.value.trim();
+            const words = text.length === 0 ? 0 : text.split(/\s+/).length;
+            wordCountDisplay.textContent = `Word count: ${words}`;
+        }
 
         // Load the saved note from localStorage when the page loads
         window.addEventListener('load', () => {
@@ -104,17 +146,29 @@
             if (savedNote) {
                 notepad.value = savedNote;
             }
+            updateWordCount();
         });
 
-        // Save the note to localStorage whenever the user types
+        // Save the note to localStorage and update word count when typing
         notepad.addEventListener('input', () => {
             localStorage.setItem('userNote', notepad.value);
+            updateWordCount();
         });
 
-        // Clear the notepad and localStorage when the button is clicked
+        // Clear the notepad and localStorage when the clear button is clicked
         clearBtn.addEventListener('click', () => {
-            notepad.value = ''; // Clear the textarea
-            localStorage.removeItem('userNote'); // Remove the item from storage
+            notepad.value = '';
+            localStorage.removeItem('userNote');
+            updateWordCount();
+        });
+
+        // Show save confirmation when save button is clicked
+        saveBtn.addEventListener('click', () => {
+            localStorage.setItem('userNote', notepad.value);
+            saveMessage.style.display = 'block';
+            setTimeout(() => {
+                saveMessage.style.display = 'none';
+            }, 2000);
         });
     </script>
 </body>
