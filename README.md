@@ -1,32 +1,32 @@
-To-Do List App 🚀
-Description
-Tired of juggling a million tasks in your head? Say goodbye to sticky notes and hello to effortless organization! The To-Do List App is your new personal assistant for managing daily chores, work projects, and pernal goals. With a clean, beautiful, and intuitive interface, you'll finally be in control of your day.
+# 📝 To-Do List App
 
-Features
-✅ Add Tasks: Quickly add new tasks to your list.
+Tired of juggling a million tasks in your head? Say goodbye to sticky notes and hello to effortless organization!
+The To-Do List App is your personal assistant for managing daily chores, work projects, and personal goals.
+With a clean, intuitive interface, you'll finally be in control of your day.
 
-✍️ Mark as Coplete: Click on a task to mark it as completed. Copleted tasks are visually istinguished from peding ones.
+## ✨ Features
 
-🗑️ Delete Tasks: Remove tsks you no longer need with a single click.
+- ✅ **Add Tasks** – Quickly add new tasks to your list
+- ✍️ **Mark as Complete** – Click a task to mark it as completed
+- 🗑️ **Delete Tasks** – Remove tasks you no longer need
+- 💾 **Persistent Storage** – Tasks saved in browser's local storage
+- 🎨 **Clean UI** – Minimalist, user-friendly design
 
-💾 Persistent Storage: Your to-do list is saved in your browser's local strage, so your tasks will be there when you return.
+## 📌 How to Use
 
-✨ Clean UI: A minmalist and user-friendly design that is easy to navigate.
+1. Open the application in your web browser
+2. Add a task: Type in the input field and press Enter or click Add
+3. Complete a task: Click the task text to toggle completion
+4. Delete a task: Click Delete next to any task
 
-How to Use
-Open the application in your web browser.
+## 🛠️ Technologies Used
 
-Add a task: Type your task into the input field at the top and press Enter or click the "Add" button.
+- **HTML5** – Structure and content
+- **CSS3** – Styling and responsive design
+- **JavaScript** – Interactive features and local storage
 
-Complete a task: Clik on the task text to toggle its cometion status.
+## Getting Started
 
-Delete a task: Click the "Delete" btton next to the task you wish to remove.
-
-Technologies Used
-HTML5: For the structure and content of the application.
-
-CSS3: For styling and creating a responsive, modern look.
-
-JavaScript: For all the interactive features and logic, including task management and local storage.
-
-Feel free to modify this README to better fit the specific features of your app!
+1. Clone the repository
+2. Navigate to the project directory
+3. Open `index.html` in your browser
