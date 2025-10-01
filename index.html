@@ -3,119 +3,1133 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Notepad</title>
+    <title>NoteFlow AI - Smart Notepad</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
-        /* CSS styles are embedded here */
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #6c5ce7;
+            --danger-color: #e74c3c;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --dark-bg: #1e272e;
+            --light-bg: #f4f7f9;
+            --card-bg: #ffffff;
+            --text-primary: #2c3e50;
+            --text-secondary: #7f8c8d;
+            --border-color: #dcdfe6;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --shadow-hover: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f4f7f9;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--text-primary);
+            transition: background 0.3s ease;
+        }
+
+        body.dark-mode {
+            background: linear-gradient(135deg, #232526 0%, #414345 100%);
         }
 
         .container {
-            width: 90%;
-            max-width: 800px;
-            height: 80vh;
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 20px;
+            height: calc(100vh - 40px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            overflow-y: auto;
             display: flex;
             flex-direction: column;
-            background-color: #ffffff;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            padding: 2rem;
         }
 
-        header {
+        .dark-mode .sidebar {
+            background: var(--dark-bg);
+            color: #ecf0f1;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             text-align: center;
-            margin-bottom: 1.5rem;
-            border-bottom: 1px solid #e0e0e0;
-            padding-bottom: 1rem;
         }
 
-        h1 {
-            margin: 0;
-            color: #2c3e50;
+        .note-list {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 15px;
         }
 
-        p {
-            color: #7f8c8d;
+        .note-item {
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .note-item:hover {
+            background: #f0f3f7;
+            transform: translateX(5px);
+        }
+
+        .dark-mode .note-item:hover {
+            background: #34495e;
+        }
+
+        .note-item.active {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .note-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+            font-size: 14px;
+        }
+
+        .note-preview {
+            font-size: 12px;
+            opacity: 0.7;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .note-date {
+            font-size: 10px;
+            margin-top: 4px;
+            opacity: 0.6;
+        }
+
+        .sidebar-btn {
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+
+        .sidebar-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        /* Main Content */
+        .main-content {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .dark-mode .main-content {
+            background: var(--dark-bg);
+            color: #ecf0f1;
+        }
+
+        /* Header */
+        .header {
+            padding: 20px 30px;
+            border-bottom: 2px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .header-title {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-stats {
+            display: flex;
+            gap: 20px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Toolbar */
+        .toolbar {
+            padding: 15px 30px;
+            background: #f8f9fa;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .dark-mode .toolbar {
+            background: #2c3e50;
+        }
+
+        .toolbar-btn {
+            padding: 8px 16px;
+            border: 1px solid var(--border-color);
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .toolbar-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .dark-mode .toolbar-btn {
+            background: #34495e;
+            color: #ecf0f1;
+            border-color: #4a5d73;
+        }
+
+        .toolbar-separator {
+            width: 1px;
+            height: 24px;
+            background: var(--border-color);
+            margin: 0 5px;
+        }
+
+        /* Editor Area */
+        .editor-container {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+            position: relative;
         }
 
         #notepad {
-            flex-grow: 1;
-            border: 1px solid #dcdfe6;
-            border-radius: 6px;
-            padding: 1rem;
-            font-size: 1rem;
-            line-height: 1.6;
+            width: 100%;
+            height: 100%;
+            border: none;
+            font-size: 16px;
+            line-height: 1.8;
             resize: none;
             outline: none;
-            transition: border-color 0.3s;
+            background: transparent;
+            color: inherit;
+            font-family: 'Inter', sans-serif;
         }
 
-        #notepad:focus {
-            border-color: #4a90e2;
+        /* AI Panel */
+        .ai-panel {
+            position: fixed;
+            right: -400px;
+            top: 20px;
+            width: 380px;
+            height: calc(100vh - 40px);
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow-hover);
+            transition: right 0.3s ease;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
         }
 
-        #clearBtn {
-            margin-top: 1rem;
-            padding: 0.75rem 1.5rem;
+        .ai-panel.active {
+            right: 20px;
+        }
+
+        .dark-mode .ai-panel {
+            background: var(--dark-bg);
+            color: #ecf0f1;
+        }
+
+        .ai-panel-header {
+            padding: 20px;
+            border-bottom: 2px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .ai-panel-title {
+            font-size: 20px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .close-ai {
+            background: none;
             border: none;
-            background-color: #e74c3c;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        .ai-panel-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .ai-action-btn {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 10px;
+            border: 2px solid var(--primary-color);
+            background: white;
+            color: var(--primary-color);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .ai-action-btn:hover {
+            background: var(--primary-color);
             color: white;
-            font-size: 1rem;
-            font-weight: 500;
+            transform: scale(1.02);
+        }
+
+        .ai-result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        .dark-mode .ai-result {
+            background: #34495e;
+        }
+
+        /* Settings Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: var(--shadow-hover);
+        }
+
+        .dark-mode .modal-content {
+            background: var(--dark-bg);
+            color: #ecf0f1;
+        }
+
+        .modal-header {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .setting-item {
+            margin-bottom: 20px;
+        }
+
+        .setting-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .setting-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--primary-color);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        /* Export Options */
+        .export-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .export-btn {
+            padding: 10px;
+            border: 2px solid var(--border-color);
+            background: white;
             border-radius: 6px;
             cursor: pointer;
-            transition: background-color 0.3s;
+            font-weight: 600;
+            transition: all 0.3s ease;
         }
 
-        #clearBtn:hover {
-            background-color: #c0392b;
+        .export-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            transform: scale(1.05);
+        }
+
+        /* Floating Action Button */
+        .fab {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            color: white;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: var(--shadow-hover);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .fab:hover {
+            transform: scale(1.1) rotate(90deg);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                display: none;
+            }
+            
+            .ai-panel {
+                width: 100%;
+                right: -100%;
+            }
+            
+            .ai-panel.active {
+                right: 0;
+            }
+        }
+
+        /* Search Highlight */
+        .highlight {
+            background-color: yellow;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--dark-bg);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: var(--shadow-hover);
+            transition: transform 0.3s ease;
+            z-index: 3000;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>Online Notepad</h1>
-            <p>Your notes are saved automatically.</p>
-        </header>
-        <textarea id="notepad" placeholder="Start writing..."></textarea>
-        <button id="clearBtn">Clear Note</button>
-    </div>
-    
-    <script>
-        // JavaScript logic is embedded here
-        const notepad = document.getElementById('notepad');
-        const clearBtn = document.getElementById('clearBtn');
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">📝 NoteFlow AI</div>
+            
+            <button class="sidebar-btn" onclick="createNewNote()">+ New Note</button>
+            
+            <div class="note-list" id="noteList">
+                <!-- Notes will be populated here -->
+            </div>
+            
+            <button class="sidebar-btn" style="background: var(--danger-color);" onclick="deleteCurrentNote()">
+                🗑️ Delete Note
+            </button>
+        </div>
 
-        // Load the saved note from localStorage when the page loads
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <div>
+                    <div class="header-title" id="noteTitle">Untitled Note</div>
+                    <div class="header-stats">
+                        <div class="stat-item">
+                            <span>📝</span>
+                            <span id="wordCount">0 words</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>🔤</span>
+                            <span id="charCount">0 characters</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>⏱️</span>
+                            <span id="readTime">0 min read</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>💾</span>
+                            <span id="saveStatus">Saved</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Toolbar -->
+            <div class="toolbar">
+                <button class="toolbar-btn" onclick="formatText('bold')">
+                    <strong>B</strong> Bold
+                </button>
+                <button class="toolbar-btn" onclick="formatText('italic')">
+                    <em>I</em> Italic
+                </button>
+                <button class="toolbar-btn" onclick="formatText('heading')">
+                    H Heading
+                </button>
+                <button class="toolbar-btn" onclick="formatText('list')">
+                    ≡ List
+                </button>
+                
+                <div class="toolbar-separator"></div>
+                
+                <button class="toolbar-btn" onclick="toggleAIPanel()">
+                    🤖 AI Assistant
+                </button>
+                <button class="toolbar-btn" onclick="showExportModal()">
+                    📤 Export
+                </button>
+                <button class="toolbar-btn" onclick="toggleDarkMode()">
+                    🌓 Theme
+                </button>
+                <button class="toolbar-btn" onclick="showSettingsModal()">
+                    ⚙️ Settings
+                </button>
+            </div>
+
+            <!-- Editor -->
+            <div class="editor-container">
+                <textarea id="notepad" placeholder="Start writing your masterpiece... ✨"></textarea>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Panel -->
+    <div class="ai-panel" id="aiPanel">
+        <div class="ai-panel-header">
+            <div class="ai-panel-title">🤖 AI Assistant</div>
+            <button class="close-ai" onclick="toggleAIPanel()">×</button>
+        </div>
+        <div class="ai-panel-content">
+            <h3>Smart Actions</h3>
+            <button class="ai-action-btn" onclick="aiAction('summarize')">📋 Summarize Text</button>
+            <button class="ai-action-btn" onclick="aiAction('improve')">✨ Improve Writing</button>
+            <button class="ai-action-btn" onclick="aiAction('grammar')">✓ Check Grammar</button>
+            <button class="ai-action-btn" onclick="aiAction('simplify')">💡 Simplify Language</button>
+            <button class="ai-action-btn" onclick="aiAction('expand')">📝 Expand Content</button>
+            <button class="ai-action-btn" onclick="aiAction('translate')">🌍 Translate</button>
+            <button class="ai-action-btn" onclick="aiAction('keywords')">🔑 Extract Keywords</button>
+            <button class="ai-action-btn" onclick="aiAction('sentiment')">😊 Sentiment Analysis</button>
+            
+            <div id="aiResult" class="ai-result" style="display: none;"></div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <div class="modal-header">⚙️ Settings</div>
+            
+            <div class="setting-item">
+                <label class="setting-label">Font Size</label>
+                <input type="range" class="setting-input" min="12" max="24" value="16" 
+                       onchange="changeFontSize(this.value)">
+                <span id="fontSizeValue">16px</span>
+            </div>
+            
+            <div class="setting-item">
+                <label class="setting-label">Line Height</label>
+                <input type="range" class="setting-input" min="1.2" max="2.4" step="0.2" value="1.8" 
+                       onchange="changeLineHeight(this.value)">
+                <span id="lineHeightValue">1.8</span>
+            </div>
+            
+            <div class="setting-item">
+                <label class="setting-label">Auto-Save</label>
+                <label class="toggle-switch">
+                    <input type="checkbox" checked onchange="toggleAutoSave(this.checked)">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            
+            <div class="setting-item">
+                <label class="setting-label">Spell Check</label>
+                <label class="toggle-switch">
+                    <input type="checkbox" checked onchange="toggleSpellCheck(this.checked)">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            
+            <button class="sidebar-btn" onclick="closeModal('settingsModal')">Close</button>
+        </div>
+    </div>
+
+    <!-- Export Modal -->
+    <div class="modal" id="exportModal">
+        <div class="modal-content">
+            <div class="modal-header">📤 Export Note</div>
+            <p>Choose your export format:</p>
+            <div class="export-options">
+                <button class="export-btn" onclick="exportNote('txt')">📄 Text (.txt)</button>
+                <button class="export-btn" onclick="exportNote('md')">📝 Markdown (.md)</button>
+                <button class="export-btn" onclick="exportNote('html')">🌐 HTML (.html)</button>
+                <button class="export-btn" onclick="exportNote('pdf')">📕 PDF (.pdf)</button>
+            </div>
+            <button class="sidebar-btn" style="margin-top: 20px;" onclick="closeModal('exportModal')">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <!-- Floating Action Button -->
+    <button class="fab" onclick="voiceToText()" title="Voice Input">🎤</button>
+
+    <script>
+        // Application State
+        let currentNoteId = null;
+        let notes = JSON.parse(localStorage.getItem('notes')) || [];
+        let autoSaveEnabled = true;
+        let autoSaveTimeout = null;
+
+        // DOM Elements
+        const notepad = document.getElementById('notepad');
+        const wordCount = document.getElementById('wordCount');
+        const charCount = document.getElementById('charCount');
+        const readTime = document.getElementById('readTime');
+        const saveStatus = document.getElementById('saveStatus');
+        const noteTitle = document.getElementById('noteTitle');
+        const noteList = document.getElementById('noteList');
+        const aiPanel = document.getElementById('aiPanel');
+
+        // Initialize
         window.addEventListener('load', () => {
-            const savedNote = localStorage.getItem('userNote');
-            if (savedNote) {
-                notepad.value = savedNote;
+            renderNoteList();
+            if (notes.length > 0) {
+                loadNote(notes[0].id);
+            } else {
+                createNewNote();
+            }
+            
+            // Keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                if (e.ctrlKey || e.metaKey) {
+                    switch(e.key) {
+                        case 's':
+                            e.preventDefault();
+                            saveCurrentNote();
+                            break;
+                        case 'n':
+                            e.preventDefault();
+                            createNewNote();
+                            break;
+                        case 'b':
+                            e.preventDefault();
+                            formatText('bold');
+                            break;
+                        case 'i':
+                            e.preventDefault();
+                            formatText('italic');
+                            break;
+                    }
+                }
+            });
+        });
+
+        // Real-time updates
+        notepad.addEventListener('input', () => {
+            updateStats();
+            updateSaveStatus('Unsaved...');
+            
+            if (autoSaveEnabled) {
+                clearTimeout(autoSaveTimeout);
+                autoSaveTimeout = setTimeout(() => {
+                    saveCurrentNote();
+                }, 2000);
             }
         });
 
-        // Save the note to localStorage whenever the user types
-        notepad.addEventListener('input', () => {
-            localStorage.setItem('userNote', notepad.value);
-        });
+        // Create New Note
+        function createNewNote() {
+            const newNote = {
+                id: Date.now(),
+                title: 'Untitled Note',
+                content: '',
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            };
+            
+            notes.unshift(newNote);
+            localStorage.setItem('notes', JSON.stringify(notes));
+            currentNoteId = newNote.id;
+            
+            notepad.value = '';
+            noteTitle.textContent = newNote.title;
+            renderNoteList();
+            updateStats();
+            showToast('New note created! 📝');
+        }
 
-        // Clear the notepad and localStorage when the button is clicked
-        clearBtn.addEventListener('click', () => {
-            notepad.value = ''; // Clear the textarea
-            localStorage.removeItem('userNote'); // Remove the item from storage
-        });
+        // Load Note
+        function loadNote(id) {
+            const note = notes.find(n => n.id === id);
+            if (!note) return;
+            
+            currentNoteId = id;
+            notepad.value = note.content;
+            noteTitle.textContent = note.title;
+            updateStats();
+            renderNoteList();
+        }
+
+        // Save Current Note
+        function saveCurrentNote() {
+            if (!currentNoteId) return;
+            
+            const noteIndex = notes.findIndex(n => n.id === currentNoteId);
+            if (noteIndex === -1) return;
+            
+            const content = notepad.value;
+            const firstLine = content.split('\n')[0].substring(0, 50) || 'Untitled Note';
+            
+            notes[noteIndex].content = content;
+            notes[noteIndex].title = firstLine;
+            notes[noteIndex].updatedAt = new Date().toISOString();
+            
+            localStorage.setItem('notes', JSON.stringify(notes));
+            noteTitle.textContent = firstLine;
+            renderNoteList();
+            updateSaveStatus('Saved ✓');
+            
+            setTimeout(() => updateSaveStatus('Saved'), 2000);
+        }
+
+        // Delete Current Note
+        function deleteCurrentNote() {
+            if (!currentNoteId || !confirm('Delete this note?')) return;
+            
+            notes = notes.filter(n => n.id !== currentNoteId);
+            localStorage.setItem('notes', JSON.stringify(notes));
+            
+            if (notes.length > 0) {
+                loadNote(notes[0].id);
+            } else {
+                createNewNote();
+            }
+            
+            renderNoteList();
+            showToast('Note deleted! 🗑️');
+        }
+
+        // Render Note List
+        function renderNoteList() {
+            noteList.innerHTML = notes.map(note => `
+                <div class="note-item ${note.id === currentNoteId ? 'active' : ''}" 
+                     onclick="loadNote(${note.id})">
+                    <div class="note-title">${note.title}</div>
+                    <div class="note-preview">${note.content.substring(0, 50)}...</div>
+                    <div class="note-date">${formatDate(note.updatedAt)}</div>
+                </div>
+            `).join('');
+        }
+
+        // Update Statistics
+        function updateStats() {
+            const text = notepad.value;
+            const words = text.trim().split(/\s+/).filter(w => w.length > 0).length;
+            const chars = text.length;
+            const minutes = Math.ceil(words / 200);
+            
+            wordCount.textContent = `${words} words`;
+            charCount.textContent = `${chars} characters`;
+            readTime.textContent = `${minutes} min read`;
+        }
+
+        // Update Save Status
+        function updateSaveStatus(status) {
+            saveStatus.textContent = status;
+        }
+
+        // Format Text (Markdown-style)
+        function formatText(type) {
+            const start = notepad.selectionStart;
+            const end = notepad.selectionEnd;
+            const selectedText = notepad.value.substring(start, end);
+            let formattedText = '';
+            
+            switch(type) {
+                case 'bold':
+                    formattedText = `**${selectedText}**`;
+                    break;
+                case 'italic':
+                    formattedText = `*${selectedText}*`;
+                    break;
+                case 'heading':
+                    formattedText = `# ${selectedText}`;
+                    break;
+                case 'list':
+                    formattedText = `- ${selectedText}`;
+                    break;
+            }
+            
+            notepad.value = notepad.value.substring(0, start) + formattedText + notepad.value.substring(end);
+            notepad.focus();
+            updateStats();
+        }
+
+        // AI Actions (Simulated)
+        function aiAction(action) {
+            const text = notepad.value;
+            if (!text) {
+                showToast('Please write some text first!');
+                return;
+            }
+            
+            const aiResult = document.getElementById('aiResult');
+            aiResult.style.display = 'block';
+            aiResult.innerHTML = '<div class="spinner"></div>';
+            
+            // Simulate AI processing
+            setTimeout(() => {
+                let result = '';
+                switch(action) {
+                    case 'summarize':
+                        result = `<strong>Summary:</strong><br>${text.substring(0, 100)}... (This is a demo summary)`;
+                        break;
+                    case 'improve':
+                        result = `<strong>Improved version:</strong><br>Your text has been enhanced with better vocabulary and structure. (Demo)`;
+                        break;
+                    case 'grammar':
+                        result = `<strong>Grammar Check:</strong><br>✓ No major errors found! Great job! (Demo)`;
+                        break;
+                    case 'simplify':
+                        result = `<strong>Simplified:</strong><br>Your text in simpler words. (Demo)`;
+                        break;
+                    case 'expand':
+                        result = `<strong>Expanded:</strong><br>${text}<br><br>Additional context and details added... (Demo)`;
+                        break;
+                    case 'translate':
+                        result = `<strong>Translation:</strong><br>Select language and your text will be translated. (Demo)`;
+                        break;
+                    case 'keywords':
+                        result = `<strong>Keywords:</strong><br>📌 notepad, 📌 features, 📌 AI, 📌 writing (Demo)`;
+                        break;
+                    case 'sentiment':
+                        result = `<strong>Sentiment:</strong><br>😊 Positive (85%) - Your text conveys a positive tone! (Demo)`;
+                        break;
+                }
+                aiResult.innerHTML = result;
+            }, 1500);
+        }
+
+        // Toggle AI Panel
+        function toggleAIPanel() {
+            aiPanel.classList.toggle('active');
+        }
+
+        // Toggle Dark Mode
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDark);
+            showToast(isDark ? '🌙 Dark mode enabled' : '☀️ Light mode enabled');
+        }
+
+        // Export Note
+        function exportNote(format) {
+            const content = notepad.value;
+            const title = noteTitle.textContent;
+            let blob, filename;
+            
+            switch(format) {
+                case 'txt':
+                    blob = new Blob([content], { type: 'text/plain' });
+                    filename = `${title}.txt`;
+                    break;
+                case 'md':
+                    blob = new Blob([content], { type: 'text/markdown' });
+                    filename = `${title}.md`;
+                    break;
+                case 'html':
+                    const html = `<!DOCTYPE html><html><head><title>${title}</title></head><body><pre>${content}</pre></body></html>`;
+                    blob = new Blob([html], { type: 'text/html' });
+                    filename = `${title}.html`;
+                    break;
+                case 'pdf':
+                    showToast('PDF export requires server-side processing (Demo)');
+                    closeModal('exportModal');
+                    return;
+            }
+            
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            closeModal('exportModal');
+            showToast(`Exported as ${format.toUpperCase()}! 📤`);
+        }
+
+        // Voice to Text (Simulated)
+        function voiceToText() {
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                const recognition = new SpeechRecognition();
+                
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                
+                recognition.onstart = () => {
+                    showToast('🎤 Listening...');
+                };
+                
+                recognition.onresult = (event) => {
+                    const transcript = event.results[0][0].transcript;
+                    notepad.value += transcript + ' ';
+                    updateStats();
+                    showToast('Voice input added! ✓');
+                };
+                
+                recognition.onerror = () => {
+                    showToast('Voice input error!');
+                };
+                
+                recognition.start();
+            } else {
+                showToast('Voice input not supported in your browser');
+            }
+        }
+
+        // Settings Functions
+        function changeFontSize(value) {
+            notepad.style.fontSize = value + 'px';
+            document.getElementById('fontSizeValue').textContent = value + 'px';
+            localStorage.setItem('fontSize', value);
+        }
+
+        function changeLineHeight(value) {
+            notepad.style.lineHeight = value;
+            document.getElementById('lineHeightValue').textContent = value;
+            localStorage.setItem('lineHeight', value);
+        }
+
+        function toggleAutoSave(enabled) {
+            autoSaveEnabled = enabled;
+            showToast(enabled ? 'Auto-save enabled ✓' : 'Auto-save disabled');
+        }
+
+        function toggleSpellCheck(enabled) {
+            notepad.spellcheck = enabled;
+            showToast(enabled ? 'Spell check enabled ✓' : 'Spell check disabled');
+        }
+
+        // Modal Functions
+        function showSettingsModal() {
+            document.getElementById('settingsModal').classList.add('active');
+        }
+
+        function showExportModal() {
+            document.getElementById('exportModal').classList.add('active');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        // Toast Notification
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Format Date
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diff = now - date;
+            const minutes = Math.floor(diff / 60000);
+            const hours = Math.floor(diff / 3600000);
+            const days = Math.floor(diff / 86400000);
+            
+            if (minutes < 1) return 'Just now';
+            if (minutes < 60) return `${minutes}m ago`;
+            if (hours < 24) return `${hours}h ago`;
+            if (days < 7) return `${days}d ago`;
+            return date.toLocaleDateString();
+        }
+
+        // Load saved preferences
+        const savedDarkMode = localStorage.getItem('darkMode') === 'true';
+        if (savedDarkMode) document.body.classList.add('dark-mode');
+
+        const savedFontSize = localStorage.getItem('fontSize');
+        if (savedFontSize) changeFontSize(savedFontSize);
+
+        const savedLineHeight = localStorage.getItem('lineHeight');
+        if (savedLineHeight) changeLineHeight(savedLineHeight);
+
+        // Close modals on outside click
+        window.onclick = (event) => {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.remove('active');
+            }
+        };
     </script>
 </body>
 </html>
