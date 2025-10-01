@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Notepad</title>
+    <title>Welltoodit - Task Notepad</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
     
     <style>
-        /* CSS styles are embedded here */
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f4f7f9;
@@ -35,87 +34,136 @@
 
         header {
             text-align: center;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
             border-bottom: 1px solid #e0e0e0;
             padding-bottom: 1rem;
         }
 
-        h1 {
-            margin: 0;
-            color: #2c3e50;
-        }
+        h1 { margin: 0; color: #2c3e50; }
+        p { color: #7f8c8d; }
 
-        p {
-            color: #7f8c8d;
-        }
-
-        #notepad {
-            flex-grow: 1;
-            border: 1px solid #dcdfe6;
-            border-radius: 6px;
-            padding: 1rem;
+        #taskInput {
+            padding: 0.75rem 1rem;
             font-size: 1rem;
-            line-height: 1.6;
-            resize: none;
+            border-radius: 6px;
+            border: 1px solid #dcdfe6;
             outline: none;
-            transition: border-color 0.3s;
+            margin-bottom: 1rem;
         }
 
-        #notepad:focus {
-            border-color: #4a90e2;
-        }
-
-        #clearBtn {
-            margin-top: 1rem;
+        #addBtn, #clearAllBtn {
             padding: 0.75rem 1.5rem;
             border: none;
-            background-color: #e74c3c;
-            color: white;
+            border-radius: 6px;
             font-size: 1rem;
             font-weight: 500;
-            border-radius: 6px;
             cursor: pointer;
+            margin-right: 0.5rem;
             transition: background-color 0.3s;
         }
 
-        #clearBtn:hover {
-            background-color: #c0392b;
+        #addBtn { background-color: #4a90e2; color: #fff; }
+        #addBtn:hover { background-color: #357ab8; }
+
+        #clearAllBtn { background-color: #e74c3c; color: #fff; }
+        #clearAllBtn:hover { background-color: #c0392b; }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            flex-grow: 1;
+            overflow-y: auto;
         }
+
+        li {
+            padding: 0.75rem 1rem;
+            border: 1px solid #dcdfe6;
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.2s;
+        }
+
+        li.completed { background-color: #dff0d8; text-decoration: line-through; }
+
+        .deleteBtn {
+            background: none;
+            border: none;
+            color: #e74c3c;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        .deleteBtn:hover { color: #c0392b; }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>Online Notepad</h1>
-            <p>Your notes are saved automatically.</p>
+            <h1>Welltoodit 📝</h1>
+            <p>Manage your tasks and notes easily!</p>
         </header>
-        <textarea id="notepad" placeholder="Start writing..."></textarea>
-        <button id="clearBtn">Clear Note</button>
+
+        <div style="margin-bottom:1rem;">
+            <input type="text" id="taskInput" placeholder="Add a new task...">
+            <button id="addBtn">➕ Add</button>
+            <button id="clearAllBtn">🧹 Clear All</button>
+        </div>
+
+        <ul id="taskList"></ul>
     </div>
-    
+
     <script>
-        // JavaScript logic is embedded here
-        const notepad = document.getElementById('notepad');
-        const clearBtn = document.getElementById('clearBtn');
+const taskInput = document.getElementById('taskInput');
+const addBtn = document.getElementById('addBtn');
+const clearAllBtn = document.getElementById('clearAllBtn');
+const taskList = document.getElementById('taskList');
 
-        // Load the saved note from localStorage when the page loads
-        window.addEventListener('load', () => {
-            const savedNote = localStorage.getItem('userNote');
-            if (savedNote) {
-                notepad.value = savedNote;
-            }
-        });
+let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
 
-        // Save the note to localStorage whenever the user types
-        notepad.addEventListener('input', () => {
-            localStorage.setItem('userNote', notepad.value);
-        });
+const saveAndRender = () => {
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+    taskList.innerHTML = '';
+    tasks.forEach((task, i) => {
+        const li = document.createElement('li');
+        li.innerHTML = `<span>${task.text}</span> <button class="deleteBtn">🗑️</button>`;
+        li.className = task.completed ? 'completed' : '';
+        taskList.appendChild(li);
 
-        // Clear the notepad and localStorage when the button is clicked
-        clearBtn.addEventListener('click', () => {
-            notepad.value = ''; // Clear the textarea
-            localStorage.removeItem('userNote'); // Remove the item from storage
-        });
-    </script>
+        li.querySelector('span').onclick = () => {
+            task.completed = !task.completed;
+            saveAndRender();
+        };
+        li.querySelector('.deleteBtn').onclick = () => {
+            tasks.splice(i, 1);
+            saveAndRender();
+        };
+    });
+};
+
+addBtn.onclick = () => {
+    const text = taskInput.value.trim();
+    if (text) {
+        tasks.push({ text, completed: false });
+        taskInput.value = '';
+        saveAndRender();
+    }
+};
+
+taskInput.onkeypress = e => { if (e.key === 'Enter') addBtn.onclick(); };
+
+clearAllBtn.onclick = () => {
+    if (tasks.length && confirm('Clear all tasks?')) {
+        tasks = [];
+        saveAndRender();
+    }
+};
+
+saveAndRender();
+</script>
+
 </body>
 </html>
