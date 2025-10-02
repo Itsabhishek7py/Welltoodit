@@ -3,119 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Notepad</title>
+    <title>Notepad</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
-    
-    <style>
-        /* CSS styles are embedded here */
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f4f7f9;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            color: #333;
-        }
-
-        .container {
-            width: 90%;
-            max-width: 800px;
-            height: 80vh;
-            display: flex;
-            flex-direction: column;
-            background-color: #ffffff;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            padding: 2rem;
-        }
-
-        header {
-            text-align: center;
-            margin-bottom: 1.5rem;
-            border-bottom: 1px solid #e0e0e0;
-            padding-bottom: 1rem;
-        }
-
-        h1 {
-            margin: 0;
-            color: #2c3e50;
-        }
-
-        p {
-            color: #7f8c8d;
-        }
-
-        #notepad {
-            flex-grow: 1;
-            border: 1px solid #dcdfe6;
-            border-radius: 6px;
-            padding: 1rem;
-            font-size: 1rem;
-            line-height: 1.6;
-            resize: none;
-            outline: none;
-            transition: border-color 0.3s;
-        }
-
-        #notepad:focus {
-            border-color: #4a90e2;
-        }
-
-        #clearBtn {
-            margin-top: 1rem;
-            padding: 0.75rem 1.5rem;
-            border: none;
-            background-color: #e74c3c;
-            color: white;
-            font-size: 1rem;
-            font-weight: 500;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        #clearBtn:hover {
-            background-color: #c0392b;
-        }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>Online Notepad</h1>
-            <p>Your notes are saved automatically.</p>
+            <div class="logo">
+                <i class="fas fa-edit"></i>
+                <h1>Notepad</h1>
+            </div>
+            <p class="subtitle">Autosaving enabled</p>
         </header>
-        <textarea id="notepad" placeholder="Start writing..."></textarea>
-        <button id="clearBtn">Clear Note</button>
+        <div class="editor-container">
+            <div class="toolbar">
+                <div class="toolbar-group">
+                    <button id="newNoteBtn" class="tool-btn" title="New Note">
+                        <i class="fas fa-plus"></i>
+                        <span>New</span>
+                    </button>
+                    <button id="downloadBtn" class="tool-btn" title="Download Note">
+                        <i class="fas fa-download"></i>
+                        <span>Save</span>
+                    </button>
+                    <button id="clearBtn" class="tool-btn danger" title="Clear Note">
+                        <i class="fas fa-trash"></i>
+                        <span>Clear</span>
+                    </button>
+                </div>
+            </div>
+            <textarea id="notepad" placeholder="Start writing your notes here..."></textarea>
+            <div class="status-bar">
+                <span id="charCount">0 characters</span>
+                <span id="saveStatus">All changes saved</span>
+            </div>
+        </div>
     </div>
-    
-    <script>
-        // JavaScript logic is embedded here
-        const notepad = document.getElementById('notepad');
-        const clearBtn = document.getElementById('clearBtn');
-
-        // Load the saved note from localStorage when the page loads
-        window.addEventListener('load', () => {
-            const savedNote = localStorage.getItem('userNote');
-            if (savedNote) {
-                notepad.value = savedNote;
-            }
-        });
-
-        // Save the note to localStorage whenever the user types
-        notepad.addEventListener('input', () => {
-            localStorage.setItem('userNote', notepad.value);
-        });
-
-        // Clear the notepad and localStorage when the button is clicked
-        clearBtn.addEventListener('click', () => {
-            notepad.value = ''; // Clear the textarea
-            localStorage.removeItem('userNote'); // Remove the item from storage
-        });
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
