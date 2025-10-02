@@ -56,5 +56,5 @@ Feel free to fork, modify, and submit a pull request.
 
 ⭐ Show Your Support
 
-If you like this project, star ⭐ the repo and share it with your friends! 🚀
+If you like this project, star ⭐ this repo and share it with your friends! 🚀
 
