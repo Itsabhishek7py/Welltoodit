@@ -22,15 +22,39 @@
         <div class="editor-container">
             <div class="toolbar">
                 <div class="toolbar-group">
-                    <button id="newNoteBtn" class="tool-btn" title="New Note">
+                    <button id="newNoteBtn" class="tool-btn" title="New Note (Ctrl+N)">
                         <i class="fas fa-plus"></i>
                         <span>New</span>
                     </button>
-                    <button id="downloadBtn" class="tool-btn" title="Download Note">
+                    <button id="downloadBtn" class="tool-btn" title="Save (Ctrl+S)">
                         <i class="fas fa-download"></i>
                         <span>Save</span>
                     </button>
-                    <button id="clearBtn" class="tool-btn danger" title="Clear Note">
+                    <button id="copyBtn" class="tool-btn" title="Copy (Ctrl+C)">
+                        <i class="fas fa-copy"></i>
+                        <span>Copy</span>
+                    </button>
+                </div>
+                <div class="toolbar-group">
+                    <button id="zoomOutBtn" class="tool-btn" title="Zoom Out (Ctrl+-)">
+                        <i class="fas fa-search-minus"></i>
+                        <span>-</span>
+                    </button>
+                    <select id="fontSize" class="font-select" title="Font Size">
+                        <option value="12">12px</option>
+                        <option value="14" selected>14px</option>
+                        <option value="16">16px</option>
+                        <option value="18">18px</option>
+                        <option value="20">20px</option>
+                        <option value="24">24px</option>
+                    </select>
+                    <button id="zoomInBtn" class="tool-btn" title="Zoom In (Ctrl+Plus)">
+                        <i class="fas fa-search-plus"></i>
+                        <span>+</span>
+                    </button>
+                </div>
+                <div class="toolbar-group">
+                    <button id="clearBtn" class="tool-btn danger" title="Clear">
                         <i class="fas fa-trash"></i>
                         <span>Clear</span>
                     </button>

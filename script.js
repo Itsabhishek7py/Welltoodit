@@ -5,8 +5,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const downloadBtn = document.getElementById('downloadBtn');
     const charCount = document.getElementById('charCount');
     const saveStatus = document.getElementById('saveStatus');
+    const copyBtn = document.getElementById('copyBtn');
+    const zoomInBtn = document.getElementById('zoomInBtn');
+    const zoomOutBtn = document.getElementById('zoomOutBtn');
+    const fontSelect = document.getElementById('fontSize');
 
     let saveTimeout;
+    let currentZoom = 1;
 
     // Load saved note
     const loadNote = () => {
@@ -85,15 +90,74 @@ document.addEventListener('DOMContentLoaded', () => {
         window.URL.revokeObjectURL(url);
     };
 
+    // Update zoom level
+    const updateZoom = (delta) => {
+        const newZoom = Math.min(Math.max(currentZoom + delta, 0.8), 2);
+        if (newZoom !== currentZoom) {
+            currentZoom = newZoom;
+            notepad.style.transform = `scale(${currentZoom})`;
+            notepad.style.transformOrigin = 'top left';
+        }
+    };
+
+    // Copy to clipboard
+    const copyToClipboard = async () => {
+        try {
+            await navigator.clipboard.writeText(notepad.value);
+            saveStatus.className = 'saved';
+            saveStatus.innerHTML = '<i class="fas fa-check"></i> Copied to clipboard';
+            setTimeout(() => {
+                saveStatus.className = '';
+                saveStatus.textContent = 'All changes saved';
+            }, 2000);
+        } catch (err) {
+            alert('Failed to copy text to clipboard');
+        }
+    };
+
+    // Update font size
+    const updateFontSize = (size) => {
+        notepad.style.fontSize = `${size}px`;
+        localStorage.setItem('fontSize', size);
+    };
+
     // Event listeners
     notepad.addEventListener('input', () => {
         updateCharCount();
         saveNote();
     });
 
+    clearBtn.addEventListener('click', clearNote);
+    newNoteBtn.addEventListener('click', createNewNote);
+    downloadBtn.addEventListener('click', downloadNote);
+    copyBtn.addEventListener('click', copyToClipboard);
+    zoomInBtn.addEventListener('click', () => updateZoom(0.1));
+    zoomOutBtn.addEventListener('click', () => updateZoom(-0.1));
+    fontSelect.addEventListener('change', (e) => updateFontSize(e.target.value));
+
     // Add keyboard shortcuts
     document.addEventListener('keydown', (e) => {
-        if (e.ctrlKey && e.key === 's') {
+        if (e.ctrlKey) {
+            switch (e.key) {
+                case '=':
+                case '+':
+                    e.preventDefault();
+                    updateZoom(0.1);
+                    break;
+                case '-':
+                    e.preventDefault();
+                    updateZoom(-0.1);
+                    break;
+                case 'c':
+                    if (notepad.selectionStart !== notepad.selectionEnd) {
+                        // Let the default copy behavior handle selected text
+                        return;
+                    }
+                    e.preventDefault();
+                    copyToClipboard();
+                    break;
+            }
+        } else if (e.ctrlKey && e.key === 's') {
             e.preventDefault();
             downloadNote();
         } else if (e.ctrlKey && e.key === 'n') {
@@ -102,12 +166,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    clearBtn.addEventListener('click', clearNote);
-    newNoteBtn.addEventListener('click', createNewNote);
-    downloadBtn.addEventListener('click', downloadNote);
-
     // Initialize
     loadNote();
     updateCharCount();
     notepad.focus();
+
+    // Load saved font size
+    const savedFontSize = localStorage.getItem('fontSize');
+    if (savedFontSize) {
+        fontSelect.value = savedFontSize;
+        updateFontSize(savedFontSize);
+    }
 });
