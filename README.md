@@ -18,7 +18,7 @@ Open the application in your web browser.
 
 Add a task: Type your task into the input field at the top and press Enter or click the "Add" button.
 
-Complete a task: Clik on the task text to toggle its cometion status.
+Complete a task: Click on the task text to toggle its cometion status.
 
 Delete a task: Click the "Delete" btton next to the task you wish to remove.
 
