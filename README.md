@@ -5,7 +5,7 @@ Tired of juggling a million tasks in your head? Say goodbye to sticky notes and 
 Features
 ✅ Add Tasks: Quickly add new tasks to your list.
 
-✍️ Mark as Coplete: Click on a task to mark it as completed. Copleted tasks are visually istinguished from peding ones.
+✍️ Mark as Coplete: Click on a task to mark it as completed. Completed tasks are visually istinguished from peding ones.
 
 🗑️ Delete Tasks: Remove tsks you no longer need with a single click.
 
