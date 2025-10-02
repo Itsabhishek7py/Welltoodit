@@ -1,3 +1,16 @@
+
+/**
+ * Notepad - A simple browser-based text editor
+ * 
+ * @license MIT
+ * @version 1.0.0
+ * @author Your Name
+ * @copyright Copyright (c) 2024
+ */
+
+// ...existing code...
+
+
 document.addEventListener('DOMContentLoaded', () => {
     const notepad = document.getElementById('notepad');
     const clearBtn = document.getElementById('clearBtn');
