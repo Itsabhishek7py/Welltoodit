@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Notepad</title>
+    <title>Online Notepad</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
-    
+
     <style>
-        /* CSS styles are embedded here */
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f4f7f9;
@@ -19,6 +18,12 @@
             align-items: center;
             height: 100vh;
             color: #333;
+            transition: background-color 0.4s, color 0.4s;
+        }
+
+        .dark-mode {
+            background-color: #121212;
+            color: #f5f5f5;
         }
 
         .container {
@@ -28,9 +33,14 @@
             display: flex;
             flex-direction: column;
             background-color: #ffffff;
-            border-radius: 8px;
+            border-radius: 10px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             padding: 2rem;
+            transition: background-color 0.4s;
+        }
+
+        .dark-mode .container {
+            background-color: #1e1e1e;
         }
 
         header {
@@ -45,8 +55,16 @@
             color: #2c3e50;
         }
 
+        .dark-mode h1 {
+            color: #f0f0f0;
+        }
+
         p {
             color: #7f8c8d;
+        }
+
+        .dark-mode p {
+            color: #bbb;
         }
 
         #notepad {
@@ -58,64 +76,141 @@
             line-height: 1.6;
             resize: none;
             outline: none;
-            transition: border-color 0.3s;
+            transition: border-color 0.3s, background-color 0.3s, color 0.3s;
         }
 
         #notepad:focus {
             border-color: #4a90e2;
         }
 
-        #clearBtn {
+        .dark-mode #notepad {
+            background-color: #2a2a2a;
+            color: #f5f5f5;
+            border-color: #444;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-top: 1rem;
-            padding: 0.75rem 1.5rem;
+        }
+
+        button {
+            padding: 0.7rem 1.3rem;
             border: none;
-            background-color: #e74c3c;
-            color: white;
-            font-size: 1rem;
-            font-weight: 500;
             border-radius: 6px;
             cursor: pointer;
+            font-weight: 500;
             transition: background-color 0.3s;
+        }
+
+        #clearBtn {
+            background-color: #e74c3c;
+            color: white;
         }
 
         #clearBtn:hover {
             background-color: #c0392b;
         }
+
+        #downloadBtn {
+            background-color: #2ecc71;
+            color: white;
+        }
+
+        #downloadBtn:hover {
+            background-color: #27ae60;
+        }
+
+        #themeToggle {
+            background-color: #4a90e2;
+            color: white;
+        }
+
+        #themeToggle:hover {
+            background-color: #357ab8;
+        }
+
+        footer {
+            text-align: right;
+            font-size: 0.9rem;
+            color: #777;
+            margin-top: 0.5rem;
+        }
     </style>
 </head>
+
 <body>
     <div class="container">
         <header>
-            <h1>Online Notepad</h1>
+            <h1>📝 Online Notepad</h1>
             <p>Your notes are saved automatically.</p>
         </header>
+
         <textarea id="notepad" placeholder="Start writing..."></textarea>
-        <button id="clearBtn">Clear Note</button>
+
+        <div class="buttons">
+            <button id="clearBtn">🗑 Clear</button>
+            <button id="downloadBtn">💾 Download</button>
+            <button id="themeToggle">🌙 Dark Mode</button>
+        </div>
+
+        <footer id="counter">0 words | 0 characters</footer>
     </div>
-    
+
     <script>
-        // JavaScript logic is embedded here
         const notepad = document.getElementById('notepad');
         const clearBtn = document.getElementById('clearBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const themeToggle = document.getElementById('themeToggle');
+        const counter = document.getElementById('counter');
+        const body = document.body;
 
-        // Load the saved note from localStorage when the page loads
+        // Load saved note
         window.addEventListener('load', () => {
             const savedNote = localStorage.getItem('userNote');
-            if (savedNote) {
-                notepad.value = savedNote;
-            }
+            if (savedNote) notepad.value = savedNote;
+            updateCounter();
         });
 
-        // Save the note to localStorage whenever the user types
+        // Save on typing
         notepad.addEventListener('input', () => {
             localStorage.setItem('userNote', notepad.value);
+            updateCounter();
         });
 
-        // Clear the notepad and localStorage when the button is clicked
+        // Clear note
         clearBtn.addEventListener('click', () => {
-            notepad.value = ''; // Clear the textarea
-            localStorage.removeItem('userNote'); // Remove the item from storage
+            notepad.value = '';
+            localStorage.removeItem('userNote');
+            updateCounter();
         });
+
+        // Download note
+        downloadBtn.addEventListener('click', () => {
+            const blob = new Blob([notepad.value], { type: 'text/plain' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'MyNote.txt';
+            link.click();
+        });
+
+        // Dark/Light Mode toggle
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            themeToggle.textContent = body.classList.contains('dark-mode')
+                ? '☀️ Light Mode'
+                : '🌙 Dark Mode';
+        });
+
+        // Word & character counter
+        function updateCounter() {
+            const text = notepad.value.trim();
+            const words = text ? text.split(/\s+/).length : 0;
+            const chars = text.length;
+            counter.textContent = `${words} words | ${chars} characters`;
+        }
     </script>
 </body>
 </html>
