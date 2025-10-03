@@ -1,6 +1,7 @@
-To-Do List App 🚀
-Description
-Tired of juggling a million tasks in your head? Say goodbye to sticky notes and hello to effortless organization! The To-Do List App is your new personal assistant for managing daily chores, work projects, and personal goals. With a clean, beautiful, and intuitive interface, you'll finally be in control of your day.
+# To-Do List App 🚀
+
+
+Tired of juggling a million tasks in your head? Say goodbye to sticky notes and hello to effortless organization! The **To-Do List App** is your new personal assistant for managing daily chores, work projects, and personal goals. With a clean, beautiful, and intuitive interface, you'll finally be in control of your day.
 
 Features
 ✅ Add Tasks: Quickly add new tasks to your list.
