@@ -1,121 +1,233 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Notepad</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
-    
-    <style>
-        /* CSS styles are embedded here */
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f4f7f9;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            color: #333;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Online Notepad</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
 
-        .container {
-            width: 90%;
-            max-width: 800px;
-            height: 80vh;
-            display: flex;
-            flex-direction: column;
-            background-color: #ffffff;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            padding: 2rem;
-        }
-
-        header {
-            text-align: center;
-            margin-bottom: 1.5rem;
-            border-bottom: 1px solid #e0e0e0;
-            padding-bottom: 1rem;
-        }
-
-        h1 {
-            margin: 0;
-            color: #2c3e50;
-        }
-
-        p {
-            color: #7f8c8d;
-        }
-
-        #notepad {
-            flex-grow: 1;
-            border: 1px solid #dcdfe6;
-            border-radius: 6px;
-            padding: 1rem;
-            font-size: 1rem;
-            line-height: 1.6;
-            resize: none;
-            outline: none;
-            transition: border-color 0.3s;
-        }
-
-        #notepad:focus {
-            border-color: #4a90e2;
-        }
-
-        #clearBtn {
-            margin-top: 1rem;
-            padding: 0.75rem 1.5rem;
-            border: none;
-            background-color: #e74c3c;
-            color: white;
-            font-size: 1rem;
-            font-weight: 500;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        #clearBtn:hover {
-            background-color: #c0392b;
-        }
-    </style>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f4f7f9;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: #333;
+      transition: background-color 0.4s, color 0.4s;
+    }
+    body.dark-mode {
+      background-color: #1e1e1e;
+      color: #e0e0e0;
+    }
+    .container {
+      width: 90%;
+      max-width: 800px;
+      height: 85vh;
+      display: flex;
+      flex-direction: column;
+      background-color: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      padding: 2rem;
+      transition: background-color 0.4s;
+    }
+    body.dark-mode .container {
+      background-color: #2c2c2c;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid #e0e0e0;
+      padding-bottom: 0.5rem;
+    }
+    h1 {
+      margin: 0;
+      color: #2c3e50;
+    }
+    body.dark-mode h1 {
+      color: #e0e0e0;
+    }
+    p {
+      color: #7f8c8d;
+      font-size: 0.9rem;
+    }
+    #datetime {
+      font-size: 0.8rem;
+      color: #999;
+      margin-top: 0.3rem;
+    }
+    #notepad {
+      flex-grow: 1;
+      border: 1px solid #dcdfe6;
+      border-radius: 6px;
+      padding: 1rem;
+      font-size: 1rem;
+      line-height: 1.6;
+      resize: none;
+      outline: none;
+      transition: border-color 0.3s, background-color 0.4s, color 0.4s;
+    }
+    #notepad:focus {
+      border-color: #4a90e2;
+    }
+    body.dark-mode #notepad {
+      background-color: #333;
+      border-color: #444;
+      color: #fff;
+    }
+    .buttons {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    button {
+      padding: 0.6rem 1.2rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 1rem;
+      transition: background-color 0.3s;
+    }
+    #clearBtn {
+      background-color: #e74c3c;
+      color: white;
+    }
+    #clearBtn:hover {
+      background-color: #c0392b;
+    }
+    #downloadBtn {
+      background-color: #4a90e2;
+      color: white;
+    }
+    #downloadBtn:hover {
+      background-color: #357ABD;
+    }
+    #themeToggle {
+      background-color: #27ae60;
+      color: white;
+    }
+    #themeToggle:hover {
+      background-color: #1e874b;
+    }
+    #counter {
+      font-size: 0.9rem;
+      color: #777;
+      margin-top: 0.5rem;
+      text-align: right;
+    }
+    #saveMsg {
+      text-align: right;
+      font-size: 0.85rem;
+      color: #27ae60;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    #saveMsg.show {
+      opacity: 1;
+    }
+  </style>
 </head>
+
 <body>
-    <div class="container">
-        <header>
-            <h1>Online Notepad</h1>
-            <p>Your notes are saved automatically.</p>
-        </header>
-        <textarea id="notepad" placeholder="Start writing..."></textarea>
-        <button id="clearBtn">Clear Note</button>
+  <div class="container">
+    <header>
+      <h1>📝 Online Notepad</h1>
+      <p>Your notes are saved automatically.</p>
+      <div id="datetime"></div>
+    </header>
+
+    <textarea id="notepad" placeholder="Start writing..."></textarea>
+
+    <div id="counter">Words: 0 | Characters: 0</div>
+    <div id="saveMsg">Note saved!</div>
+
+    <div class="buttons">
+      <button id="downloadBtn">📥 Download Note</button>
+      <button id="themeToggle">🌙 Dark Mode</button>
+      <button id="clearBtn">🗑️ Clear Note</button>
     </div>
+  </div>
+
+  <script>
+    const notepad = document.getElementById('notepad');
+    const clearBtn = document.getElementById('clearBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const themeToggle = document.getElementById('themeToggle');
+    const counter = document.getElementById('counter');
+    const saveMsg = document.getElementById('saveMsg');
+    const datetime = document.getElementById('datetime');
+
+    window.addEventListener('load', () => {
+      const savedNote = localStorage.getItem('userNote');
+      const savedTheme = localStorage.getItem('theme');
+      if (savedNote) notepad.value = savedNote;
+      if (savedTheme === 'dark') document.body.classList.add('dark-mode');
+      updateCounter();
+      updateDateTime();
+      updateThemeButton();
+    });
+
+    notepad.addEventListener('input', () => {
+      localStorage.setItem('userNote', notepad.value);
+      updateCounter();
+      showSaveMsg();
+    });
+
+    clearBtn.addEventListener('click', () => {
+      if (confirm('Are you sure you want to clear the note?')) {
+        notepad.value = '';
+        localStorage.removeItem('userNote');
+        updateCounter();
+      }
+    });
+
+    downloadBtn.addEventListener('click', () => {
+      const text = notepad.value;
+      const blob = new Blob([text], { type: 'text/plain' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'MyNote.txt';
+      link.click();
+    });
+
+    themeToggle.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+      const theme = document.body.classList.contains('dark-mode') ? 'dark' : 'light';
+      localStorage.setItem('theme', theme);
+      updateThemeButton();
+    });
+
+    function updateCounter() {
+      const text = notepad.value.trim();
+      const wordCount = text ? text.split(/\s+/).length : 0;
+      const charCount = text.length;
+      counter.textContent = `Words: ${wordCount} | Characters: ${charCount}`;
+    }
+
+    function showSaveMsg() {
+      saveMsg.classList.add('show');
+      setTimeout(() => saveMsg.classList.remove('show'), 1000);
+    }
+
+    function updateDateTime() {
+      const now = new Date();
+      datetime.textContent = now.toLocaleString();
+      setTimeout(updateDateTime, 60000);
+    }
     
-    <script>
-        // JavaScript logic is embedded here
-        const notepad = document.getElementById('notepad');
-        const clearBtn = document.getElementById('clearBtn');
-
-        // Load the saved note from localStorage when the page loads
-        window.addEventListener('load', () => {
-            const savedNote = localStorage.getItem('userNote');
-            if (savedNote) {
-                notepad.value = savedNote;
-            }
-        });
-
-        // Save the note to localStorage whenever the user types
-        notepad.addEventListener('input', () => {
-            localStorage.setItem('userNote', notepad.value);
-        });
-
-        // Clear the notepad and localStorage when the button is clicked
-        clearBtn.addEventListener('click', () => {
-            notepad.value = ''; // Clear the textarea
-            localStorage.removeItem('userNote'); // Remove the item from storage
-        });
-    </script>
+    function updateThemeButton() {
+      const isDarkMode = document.body.classList.contains('dark-mode');
+      themeToggle.textContent = isDarkMode ? '☀️ Light Mode' : '🌙 Dark Mode';
+    }
+  </script>
 </body>
 </html>
