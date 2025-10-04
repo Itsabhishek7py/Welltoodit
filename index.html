@@ -1,373 +1,539 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=850">
-  <title>Online Notepad</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
-  <style>
-    body {
-      font-family: 'Inter', sans-serif;
-      background-color: #f4f7f9;
-      margin: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      color: #333;
-      transition: background-color 0.4s, color 0.4s;
-    }
-    body.dark-mode {
-      background-color: #1e1e1e;
-      color: #e0e0e0;
-    }
-    .container {
-      width: 95%;
-      max-width: 850px;
-      height: 90vh;
-      display: flex;
-      flex-direction: column;
-      background-color: #ffffff;
-      border-radius: 10px;
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
-      padding: 1.5rem;
-      transition: background-color 0.4s;
-    }
-    body.dark-mode .container {
-      background-color: #2c2c2c;
-    }
-    header {
-      display:flex;
-      justify-content:space-between;
-      text-align: center;
-      margin-bottom: 0.7rem;
-      border-bottom: 1px solid #ddd;
-      padding-bottom: 0.5rem;
-    }
-    h1 {
-      margin: 0;
-      font-size:1.5rem;
-      color: #2c3e50;
-    }
-    body.dark-mode h1 { color: #e0e0e0; }
-    #datetime, #lastSaved {
-      font-size: 0.8rem;
-      color: #999;
-      margin-top: 0.3rem;
-    }
-    #toolbar{
-      display: flex;
-      flex-wrap: wrap;
-      gap:0.5rem;
-      margin-bottom:0.6rem;
-    }
-    #searchBox {
-      flex:1;
-      padding:0.4rem;
-      border:1px solid #ccc;
-      border-radius:5px;
-    }
-    #fontSize, #lineToggle {
-      padding:0.4rem;
-      border:1px solid #ccc;
-      border-radius:5px;
-    }
-    #notepad {
-      flex-grow: 1;
-      border: 1px solid #dcdfe6;
-      border-radius: 6px;
-      padding: 1rem;
-      font-size: 1rem;
-      line-height: 1.6;
-      resize: none;
-      outline: none;
-      transition: border-color 0.3s, background-color 0.4s, color 0.4s;
-      overflow-y: auto;
-      white-space: pre-wrap;
-    }
-    #notepad:focus {
-      border-color: #4a90e2;
-    }
-    body.dark-mode #notepad {
-      background-color: #333;
-      border-color: #444;
-      color: #fff;
-    }
-    .buttons {
-      display: flex;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      margin-top: 0.8rem;
-      gap: 0.5rem;
-    }
-    button {
-      padding: 0.6rem 1rem;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: 500;
-      font-size: 0.9rem;
-      transition: background-color 0.3s;
-    }
-    #clearBtn { background-color: #e74c3c; color: white; }
-    #clearBtn:hover { background-color: #c0392b; }
-    #downloadBtn { background-color: #4a90e2; color: white; }
-    #downloadBtn:hover { background-color: #357ABD; }
-    #pdfBtn { background-color: #9b59b6; color:white; }
-    #pdfBtn:hover { background-color: #8e44ad; }
-    #themeToggle { background-color: #27ae60; color: white; }
-    #themeToggle:hover { background-color: #1e874b; }
-    #speechBtn { background-color: #f39c12; color:white; }
-    #speechBtn:hover { background-color: #d68910; }
-    #printBtn { background-color: #16a085; color:white; }
-    #printBtn:hover { background-color: #13856b; }
-    #undoBtn, #redoBtn { background-color:#95a5a6; color:white; }
-    #counter {
-      font-size: 0.9rem;
-      color: #777;
-      margin-top: 0.5rem;
-      text-align: right;
-    }
-    #saveMsg {
-      text-align: right;
-      font-size: 0.9rem;
-      color: #27ae60;
-      opacity: 0;
-      transition: opacity 0.3s;
-    }
-    #saveMsg.show { opacity: 1; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Video Downloader</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 30px 0;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #ff416c, #ff4b2b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 10px rgba(255, 65, 108, 0.3);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #a0a0c0;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .main-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .input-section {
+            flex: 1;
+            min-width: 300px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .preview-section {
+            flex: 1;
+            min-width: 300px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #ff4b2b;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title i {
+            font-size: 1.8rem;
+        }
+
+        .url-input {
+            width: 100%;
+            padding: 15px;
+            border-radius: 10px;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .url-input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 0 2px #ff4b2b;
+        }
+
+        .url-input::placeholder {
+            color: #a0a0c0;
+        }
+
+        .btn {
+            padding: 15px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(to right, #ff416c, #ff4b2b);
+            color: white;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 20px rgba(255, 75, 43, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .video-preview {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .video-preview img {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 10px;
+        }
+
+        .video-info {
+            margin-bottom: 20px;
+        }
+
+        .video-title {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        .video-details {
+            display: flex;
+            gap: 15px;
+            color: #a0a0c0;
+            font-size: 0.9rem;
+        }
+
+        .format-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .format-option {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .format-option:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .format-option.selected {
+            border-color: #ff4b2b;
+            background: rgba(255, 75, 43, 0.1);
+        }
+
+        .format-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .format-quality {
+            color: #a0a0c0;
+            font-size: 0.9rem;
+        }
+
+        .download-section {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .download-btn {
+            background: linear-gradient(to right, #00b09b, #96c93d);
+            color: white;
+            padding: 18px 30px;
+            font-size: 1.1rem;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 20px rgba(0, 176, 155, 0.4);
+        }
+
+        .download-btn:disabled {
+            background: #555;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .instructions {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .instructions h2 {
+            margin-bottom: 15px;
+            color: #ff4b2b;
+        }
+
+        .instructions ol {
+            padding-left: 20px;
+            line-height: 1.8;
+            color: #a0a0c0;
+        }
+
+        .instructions li {
+            margin-bottom: 10px;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px;
+            color: #a0a0c0;
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid #ff4b2b;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1>📝 Online Notepad</h1>
-      <div>
-        <div id="datetime"></div>
-        <div id="lastSaved"></div>
-      </div>
-    </header>
-    <div id="toolbar">
-      <input type="text" id="searchBox" placeholder="🔍 Search in note...">
-      <select id="fontSize">
-        <option value="14px">Small</option>
-        <option value="16px" selected>Normal</option>
-        <option value="18px">Large</option>
-        <option value="20px">Extra Large</option>
-      </select>
-      <select id="lineToggle">
-        <option value="off">Line Numbers: Off</option>
-        <option value="on">Line Numbers: On</option>
-      </select>
+    <div class="container">
+        <header>
+            <h1>YouTube Video Downloader</h1>
+            <p class="subtitle">Download your favorite YouTube videos in multiple formats with just a few clicks</p>
+        </header>
+
+        <div class="main-content">
+            <div class="input-section">
+                <h2 class="section-title">
+                    <i>📥</i> Enter YouTube URL
+                </h2>
+                <input type="text" class="url-input" placeholder="Paste YouTube video link here...">
+                <button class="btn btn-primary" id="fetchBtn">
+                    <i>🔍</i> Fetch Video Info
+                </button>
+                <button class="btn btn-secondary" id="clearBtn">
+                    <i>🗑️</i> Clear
+                </button>
+                
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>Fetching video information...</p>
+                </div>
+            </div>
+
+            <div class="preview-section">
+                <h2 class="section-title">
+                    <i>🎬</i> Video Preview
+                </h2>
+                <div class="video-preview" id="videoPreview">
+                    <p>Video preview will appear here</p>
+                </div>
+                <div class="video-info">
+                    <h3 class="video-title" id="videoTitle">Video title will appear here</h3>
+                    <div class="video-details">
+                        <span id="videoDuration">Duration: --:--</span>
+                        <span id="videoAuthor">Author: Unknown</span>
+                    </div>
+                </div>
+                
+                <h2 class="section-title">
+                    <i>📁</i> Select Format
+                </h2>
+                <div class="format-options" id="formatOptions">
+                    <!-- Format options will be dynamically added here -->
+                </div>
+                
+                <div class="download-section">
+                    <button class="btn download-btn" id="downloadBtn" disabled>
+                        <i>⬇️</i> Download Video
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="instructions">
+            <h2>How to Use This Downloader</h2>
+            <ol>
+                <li>Copy the URL of the YouTube video you want to download</li>
+                <li>Paste the URL in the input field above</li>
+                <li>Click "Fetch Video Info" to load the video details</li>
+                <li>Select your preferred format and quality</li>
+                <li>Click "Download Video" to save it to your device</li>
+            </ol>
+        </div>
+
+        <footer>
+            <p>YouTube Video Downloader &copy; 2023 | For educational purposes only</p>
+        </footer>
     </div>
-    <textarea id="notepad" placeholder="Start writing..."></textarea>
-    <div id="counter">Words: 0 | Characters: 0</div>
-    <div id="saveMsg">✅ Note saved!</div>
-    <div class="buttons">
-      <button id="downloadBtn">📥 Download TXT</button>
-      <button id="pdfBtn">📄 Export PDF</button>
-      <button id="printBtn">🖨️ Print</button>
-      <button id="speechBtn">🎙️ Dictate</button>
-      <button id="undoBtn">↩️ Undo</button>
-      <button id="redoBtn">↪️ Redo</button>
-      <button id="themeToggle">🌙 Dark Mode</button>
-      <button id="clearBtn">🗑️ Clear</button>
-    </div>
-  </div>
-  <script>
-    const notepad = document.getElementById('notepad');
-    const clearBtn = document.getElementById('clearBtn');
-    const downloadBtn = document.getElementById('downloadBtn');
-    const pdfBtn = document.getElementById('pdfBtn');
-    const themeToggle = document.getElementById('themeToggle');
-    const counter = document.getElementById('counter');
-    const saveMsg = document.getElementById('saveMsg');
-    const datetime = document.getElementById('datetime');
-    const lastSaved = document.getElementById('lastSaved');
-    const searchBox = document.getElementById('searchBox');
-    const fontSize = document.getElementById('fontSize');
-    const lineToggle = document.getElementById('lineToggle');
-    const speechBtn = document.getElementById('speechBtn');
-    const undoBtn = document.getElementById('undoBtn');
-    const redoBtn = document.getElementById('redoBtn');
-    const printBtn = document.getElementById('printBtn');
 
-    let history = [];
-    let redoStack = [];
-    let lastSavedValue = "";
-
-    window.addEventListener('load', () => {
-      const savedNote = localStorage.getItem('userNote');
-      if (savedNote) notepad.value = savedNote;
-      updateCounter();
-      updateDateTime();
-      setInterval(updateDateTime, 60000);
-      lastSavedValue = notepad.value;
-      history = [notepad.value]; // Initialize with first loaded value
-    });
-
-    notepad.addEventListener('input', () => {
-      localStorage.setItem('userNote', notepad.value);
-      updateCounter();
-      showSaveMsg();
-      lastSaved.textContent = "💾 Last saved: " + new Date().toLocaleTimeString();
-      // Only push to history if content changed
-      if (history.length === 0 || notepad.value !== history[history.length-1]) {
-        history.push(notepad.value);
-      }
-      redoStack = []; // Clear redo stack on new input
-    });
-
-    clearBtn.addEventListener('click', () => {
-      if (confirm('Clear note?')) {
-        notepad.value = '';
-        localStorage.removeItem('userNote');
-        updateCounter();
-        history.push('');
-        redoStack = [];
-      }
-    });
-
-    downloadBtn.addEventListener('click', () => {
-      const blob = new Blob([notepad.value], { type: 'text/plain' });
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = 'MyNote.txt';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    });
-
-    pdfBtn.addEventListener('click', () => {
-      const win = window.open("", "_blank");
-      win.document.write(`
-        <html>
-        <head>
-          <title>Note PDF</title>
-          <style>
-            body { font-family: 'Inter', Arial, sans-serif; margin:20px; }
-            pre { white-space: pre-wrap; font-size: 1rem; }
-          </style>
-        </head>
-        <body>
-          <pre>${notepad.value.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</pre>
-          <script>window.onload = () => { window.print(); }<\/script>
-        </body>
-        </html>
-      `);
-      win.document.close();
-    });
-
-    printBtn.addEventListener('click', () => {
-      const win = window.open("", "_blank");
-      win.document.write(`
-        <html>
-        <head>
-          <title>Print Note</title>
-          <style>
-            body { font-family: 'Inter', Arial, sans-serif; margin:20px; }
-            pre { white-space: pre-wrap; font-size: 1rem; }
-          </style>
-        </head>
-        <body>
-          <pre>${notepad.value.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</pre>
-          <script>window.onload = () => { window.print(); }<\/script>
-        </body>
-        </html>
-      `);
-      win.document.close();
-    });
-
-    themeToggle.addEventListener('click', () => {
-      document.body.classList.toggle('dark-mode');
-      themeToggle.textContent = document.body.classList.contains('dark-mode')
-        ? "☀️ Light Mode"
-        : "🌙 Dark Mode";
-    });
-
-    fontSize.addEventListener('change', () => notepad.style.fontSize = fontSize.value);
-
-    // Undo
-    undoBtn.addEventListener('click', () => {
-      if (history.length > 1) {
-        redoStack.push(history.pop());
-        notepad.value = history[history.length-1];
-        localStorage.setItem('userNote', notepad.value);
-        updateCounter();
-      }
-    });
-
-    // Redo
-    redoBtn.addEventListener('click', () => {
-      if (redoStack.length > 0) {
-        const redoValue = redoStack.pop();
-        history.push(redoValue);
-        notepad.value = redoValue;
-        localStorage.setItem('userNote', notepad.value);
-        updateCounter();
-      }
-    });
-
-    function updateCounter() {
-      const text = notepad.value.trim();
-      const wordCount = text ? text.split(/\s+/).length : 0;
-      counter.textContent = `Words: ${wordCount} | Characters: ${text.length}`;
-    }
-
-    function showSaveMsg() {
-      saveMsg.classList.add('show');
-      setTimeout(() => saveMsg.classList.remove('show'), 1000);
-    }
-
-    function updateDateTime() {
-      datetime.textContent = "🕒 " + new Date().toLocaleString();
-    }
-
-    // 🎙️ Speech to Text
-    speechBtn.addEventListener('click', () => {
-      if (!('webkitSpeechRecognition' in window)) {
-        alert("Speech recognition not supported in this browser!");
-        return;
-      }
-      const recognition = new webkitSpeechRecognition();
-      recognition.lang = "en-US";
-      recognition.onresult = (e) => {
-        notepad.value += " " + e.results[0][0].transcript;
-        notepad.dispatchEvent(new Event('input'));
-      };
-      recognition.start();
-    });
-
-    // Search inside note (highlight or scroll, optional)
-    searchBox.addEventListener('input', () => {
-      const term = searchBox.value.trim();
-      if (!term) {
-        notepad.scrollTop = 0;
-        notepad.setSelectionRange(0,0);
-        return;
-      }
-      const pos = notepad.value.toLowerCase().indexOf(term.toLowerCase());
-      if (pos !== -1) {
-        notepad.focus();
-        notepad.setSelectionRange(pos, pos+term.length);
-      }
-    });
-
-    // Line numbers display toggle (visual only, for demo)
-    lineToggle.addEventListener('change', () => {
-      if (lineToggle.value === "on") {
-        notepad.style.backgroundImage =
-          "linear-gradient(to bottom, rgba(220,223,230,0.8) 1px, transparent 1px), linear-gradient(to right, #eaeaea 40px, transparent 40px)";
-        notepad.style.backgroundSize = "100% 2.1em, 100% 100%";
-        notepad.style.paddingLeft = "45px";
-      } else {
-        notepad.style.backgroundImage = "none";
-        notepad.style.paddingLeft = "1rem";
-      }
-    });
-
-  </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlInput = document.querySelector('.url-input');
+            const fetchBtn = document.getElementById('fetchBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const loading = document.getElementById('loading');
+            const videoPreview = document.getElementById('videoPreview');
+            const videoTitle = document.getElementById('videoTitle');
+            const videoDuration = document.getElementById('videoDuration');
+            const videoAuthor = document.getElementById('videoAuthor');
+            const formatOptions = document.getElementById('formatOptions');
+            const downloadBtn = document.getElementById('downloadBtn');
+            
+            let selectedFormat = null;
+            
+            // Sample video data for demonstration
+            const sampleVideos = [
+                {
+                    id: 'sample1',
+                    title: 'Beautiful Nature Scenery 4K',
+                    duration: '15:42',
+                    author: 'Nature Lovers',
+                    thumbnail: 'https://images.unsplash.com/photo-1501854140801-50d01698950b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
+                    formats: [
+                        { name: 'MP4', quality: '1080p', size: '45.2 MB' },
+                        { name: 'MP4', quality: '720p', size: '28.7 MB' },
+                        { name: 'MP4', quality: '480p', size: '15.3 MB' },
+                        { name: 'WebM', quality: '1080p', size: '42.1 MB' },
+                        { name: 'MP3', quality: '128 kbps', size: '12.4 MB' }
+                    ]
+                },
+                {
+                    id: 'sample2',
+                    title: 'JavaScript Tutorial for Beginners',
+                    duration: '32:15',
+                    author: 'Code Masters',
+                    thumbnail: 'https://images.unsplash.com/photo-1627398242454-45a1465c2479?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
+                    formats: [
+                        { name: 'MP4', quality: '1080p', size: '98.5 MB' },
+                        { name: 'MP4', quality: '720p', size: '62.3 MB' },
+                        { name: 'MP4', quality: '480p', size: '33.1 MB' },
+                        { name: 'WebM', quality: '720p', size: '58.9 MB' },
+                        { name: 'MP3', quality: '192 kbps', size: '44.7 MB' }
+                    ]
+                }
+            ];
+            
+            // Format selection handler
+            function selectFormat(formatElement, format) {
+                // Remove selected class from all format options
+                document.querySelectorAll('.format-option').forEach(option => {
+                    option.classList.remove('selected');
+                });
+                
+                // Add selected class to clicked option
+                formatElement.classList.add('selected');
+                
+                // Set selected format
+                selectedFormat = format;
+                
+                // Enable download button
+                downloadBtn.disabled = false;
+            }
+            
+            // Generate format options
+            function generateFormatOptions(formats) {
+                formatOptions.innerHTML = '';
+                
+                formats.forEach(format => {
+                    const formatElement = document.createElement('div');
+                    formatElement.className = 'format-option';
+                    formatElement.innerHTML = `
+                        <div class="format-name">${format.name}</div>
+                        <div class="format-quality">${format.quality}</div>
+                        <div class="format-quality">${format.size}</div>
+                    `;
+                    
+                    formatElement.addEventListener('click', () => {
+                        selectFormat(formatElement, format);
+                    });
+                    
+                    formatOptions.appendChild(formatElement);
+                });
+            }
+            
+            // Fetch video info
+            fetchBtn.addEventListener('click', function() {
+                const url = urlInput.value.trim();
+                
+                if (!url) {
+                    alert('Please enter a YouTube URL');
+                    return;
+                }
+                
+                // Show loading
+                loading.style.display = 'block';
+                
+                // Simulate API call with timeout
+                setTimeout(() => {
+                    // Hide loading
+                    loading.style.display = 'none';
+                    
+                    // For demo purposes, randomly select a sample video
+                    const randomVideo = sampleVideos[Math.floor(Math.random() * sampleVideos.length)];
+                    
+                    // Update UI with video info
+                    videoPreview.innerHTML = `<img src="${randomVideo.thumbnail}" alt="${randomVideo.title}">`;
+                    videoTitle.textContent = randomVideo.title;
+                    videoDuration.textContent = `Duration: ${randomVideo.duration}`;
+                    videoAuthor.textContent = `Author: ${randomVideo.author}`;
+                    
+                    // Generate format options
+                    generateFormatOptions(randomVideo.formats);
+                    
+                    // Reset selected format
+                    selectedFormat = null;
+                    downloadBtn.disabled = true;
+                    
+                }, 1500);
+            });
+            
+            // Clear button handler
+            clearBtn.addEventListener('click', function() {
+                urlInput.value = '';
+                videoPreview.innerHTML = '<p>Video preview will appear here</p>';
+                videoTitle.textContent = 'Video title will appear here';
+                videoDuration.textContent = 'Duration: --:--';
+                videoAuthor.textContent = 'Author: Unknown';
+                formatOptions.innerHTML = '';
+                downloadBtn.disabled = true;
+                selectedFormat = null;
+            });
+            
+            // Download button handler
+            downloadBtn.addEventListener('click', function() {
+                if (!selectedFormat) {
+                    alert('Please select a format first');
+                    return;
+                }
+                
+                // In a real application, this would trigger the actual download
+                alert(`Downloading video in ${selectedFormat.name} format (${selectedFormat.quality})...\n\nIn a real application, this would start the download process.`);
+            });
+            
+            // Demo: Auto-fill a sample URL on page load
+            setTimeout(() => {
+                urlInput.value = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
+            }, 500);
+        });
+    </script>
 </body>
 </html>
