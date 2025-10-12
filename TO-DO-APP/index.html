@@ -7,25 +7,177 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
-    <!-- Heroicons CDN -->
-    <script src="https://unpkg.com/@heroicons/v1/outline"></script>
-    
     <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            background-color: #f5f5f5;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: #fff;
+            border-right: 1px solid #ddd;
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+        }
+
+        .editor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+        }
+
+        .btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 12px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .notes-list {
+            flex: 1;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+
+        .note-item {
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            cursor: pointer;
+            background: #f9fafb;
+            transition: background 0.2s;
+        }
+
+        .note-item.active {
+            background: #dbeafe;
+        }
+
+        .note-item:hover {
+            background: #e5e7eb;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            background: #fafafa;
+        }
+
+        #noteTitle {
+            font-size: 18px;
+            padding: 8px;
+            border: none;
+            outline: none;
+            width: 70%;
+            border-bottom: 1px solid #ccc;
+            background: transparent;
+        }
+
+        #notepad {
+            flex: 1;
+            width: 100%;
+            margin-top: 10px;
+            border: none;
+            outline: none;
+            font-size: 16px;
+            padding: 10px;
+            resize: none;
+            background: transparent;
+        }
+
+        .save-status, .note-stats, #lastModified {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .note-stats {
+            margin-top: 8px;
+        }
+
+        .search-bar {
+            width: 90%;
+            padding: 8px;
+            margin: 10px auto;
+            display: block;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+
+        .backup-controls {
+            margin-top: 10px;
+            display: flex;
+            gap: 5px;
+            justify-content: space-around;
+        }
+
+        .theme-switch {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            border: none;
+            background: #2563eb;
+            color: white;
+            border-radius: 50%;
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        /* Dark Mode */
+        body.dark-mode {
+            background: #1f2937;
+            color: #f9fafb;
+        }
+        body.dark-mode .sidebar {
+            background: #111827;
+            border-color: #374151;
+        }
+        body.dark-mode .main-content {
+            background: #1f2937;
+        }
+        body.dark-mode .note-item {
+            background: #374151;
+        }
+        body.dark-mode .note-item:hover {
+            background: #4b5563;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <aside class="sidebar">
             <div class="editor-header">
                 <h2>My Notes</h2>
-                <button class="btn btn-primary" id="newNoteBtn">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                    </svg>
-                    New Note
-                </button>
+                <button class="btn" id="newNoteBtn">➕ New</button>
             </div>
-            <div class="notes-list" id="notesList">
-                <!-- Notes will be populated here -->
+
+            <input type="text" id="searchInput" placeholder="Search notes..." class="search-bar">
+            <div class="notes-list" id="notesList"></div>
+
+            <div class="backup-controls">
+                <button id="exportNotesBtn">Export</button>
+                <button id="importNotesBtn">Import</button>
+                <input type="file" id="importNotesInput" style="display:none;">
             </div>
         </aside>
 
@@ -34,23 +186,21 @@
                 <input type="text" id="noteTitle" placeholder="Note Title">
                 <span class="save-status" id="saveStatus">All changes saved</span>
                 <div>
-                    <button class="icon-btn" id="deleteNoteBtn">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                    </button>
+                    <button class="icon-btn" id="downloadNoteBtn" title="Download Note">⬇️</button>
+                    <button class="icon-btn" id="deleteNoteBtn" title="Delete Note">🗑️</button>
                 </div>
             </div>
+            <span id="lastModified">Last edited: Never</span>
             <textarea id="notepad" placeholder="Start writing..."></textarea>
+            <div class="note-stats">
+                <span id="wordCount">Words: 0</span> | 
+                <span id="charCount">Characters: 0</span>
+            </div>
         </main>
     </div>
-    <button class="theme-switch" id="themeSwitch">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="24" height="24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-        </svg>
-    </button>
-    
+
+    <button class="theme-switch" id="themeSwitch">🌙</button>
+
     <script>
         const notepad = document.getElementById('notepad');
         const noteTitle = document.getElementById('noteTitle');
@@ -59,57 +209,42 @@
         const deleteNoteBtn = document.getElementById('deleteNoteBtn');
         const saveStatus = document.getElementById('saveStatus');
         const themeSwitch = document.getElementById('themeSwitch');
+        const searchInput = document.getElementById('searchInput');
+        const wordCount = document.getElementById('wordCount');
+        const charCount = document.getElementById('charCount');
+        const lastModified = document.getElementById('lastModified');
+        const downloadNoteBtn = document.getElementById('downloadNoteBtn');
+        const exportNotesBtn = document.getElementById('exportNotesBtn');
+        const importNotesBtn = document.getElementById('importNotesBtn');
+        const importNotesInput = document.getElementById('importNotesInput');
 
         let currentNoteId = null;
         let saveTimeout = null;
 
-        // Load all notes
-        function loadNotes() {
+        function loadNotes(filter = '') {
             const notes = JSON.parse(localStorage.getItem('notes')) || [];
             notesList.innerHTML = '';
-            
-            notes.forEach(note => {
+            const filtered = notes.filter(note =>
+                note.title.toLowerCase().includes(filter.toLowerCase()) ||
+                note.content.toLowerCase().includes(filter.toLowerCase())
+            );
+
+            filtered.forEach(note => {
                 const noteElement = document.createElement('div');
                 noteElement.className = 'note-item';
                 noteElement.setAttribute('data-id', note.id);
                 noteElement.innerHTML = `
                     <div class="note-content">
                         <strong>${note.title || 'Untitled Note'}</strong>
-                        <div>
-                            ${new Date(note.lastModified).toLocaleDateString()} 
-                            ${new Date(note.lastModified).toLocaleTimeString()}
-                        </div>
-                    </div>
-                    <div class="note-actions">
-                        <button class="delete-btn" title="Delete note">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" width="20" height="20">
-                                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
-                            </svg>
-                        </button>
-                    </div>
-                `;
-                
-                // Click handler for the note content
-                noteElement.querySelector('.note-content').addEventListener('click', () => loadNote(note.id));
-                
-                // Delete handler
-                noteElement.querySelector('.delete-btn').addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    if (confirm('Are you sure you want to delete this note?')) {
-                        deleteSpecificNote(note.id);
-                    }
-                });
-                
+                        <div>${new Date(note.lastModified).toLocaleDateString()} ${new Date(note.lastModified).toLocaleTimeString()}</div>
+                    </div>`;
+                noteElement.addEventListener('click', () => loadNote(note.id));
                 notesList.appendChild(noteElement);
             });
 
-            // If no note is selected and there are notes, select the first one
-            if (!currentNoteId && notes.length > 0) {
-                loadNote(notes[0].id);
-            }
+            if (!currentNoteId && notes.length > 0) loadNote(notes[0].id);
         }
 
-        // Create new note
         function createNewNote() {
             const note = {
                 id: Date.now(),
@@ -117,187 +252,126 @@
                 content: '',
                 lastModified: new Date()
             };
-            
             const notes = JSON.parse(localStorage.getItem('notes')) || [];
             notes.unshift(note);
             localStorage.setItem('notes', JSON.stringify(notes));
-            
             loadNotes();
             loadNote(note.id);
             noteTitle.focus();
         }
 
-        // Load specific note
         function loadNote(id) {
             const notes = JSON.parse(localStorage.getItem('notes')) || [];
             const note = notes.find(n => n.id === id);
-            
             if (note) {
-                currentNoteId = note.id;
+                currentNoteId = id;
                 noteTitle.value = note.title;
                 notepad.value = note.content;
-                
-                // Update active state
-                document.querySelectorAll('.note-item').forEach(item => {
-                    item.classList.remove('active');
-                });
-                
-                const noteElement = document.querySelector(`.note-item[data-id="${note.id}"]`);
-                if (noteElement) {
-                    noteElement.classList.add('active');
-                }
+                lastModified.textContent = `Last edited: ${new Date(note.lastModified).toLocaleTimeString()}`;
+                document.querySelectorAll('.note-item').forEach(i => i.classList.remove('active'));
+                const el = document.querySelector(`.note-item[data-id="${id}"]`);
+                if (el) el.classList.add('active');
+                updateStats();
             }
         }
 
-        // Auto save functionality
         function autoSave() {
-            if (!currentNoteId) return; // Don't save if no note is selected
-            
+            if (!currentNoteId) return;
             saveStatus.textContent = 'Saving...';
-            saveStatus.classList.add('saving');
-            
-            if (saveTimeout) {
-                clearTimeout(saveTimeout);
-            }
-
+            if (saveTimeout) clearTimeout(saveTimeout);
             saveTimeout = setTimeout(() => {
                 const notes = JSON.parse(localStorage.getItem('notes')) || [];
-                const noteIndex = notes.findIndex(n => n.id === currentNoteId);
-                
-                if (noteIndex !== -1) {
-                    notes[noteIndex] = {
-                        ...notes[noteIndex],
+                const idx = notes.findIndex(n => n.id === currentNoteId);
+                if (idx !== -1) {
+                    notes[idx] = {
+                        ...notes[idx],
                         title: noteTitle.value || 'Untitled Note',
                         content: notepad.value,
                         lastModified: new Date()
                     };
-                    
                     localStorage.setItem('notes', JSON.stringify(notes));
-                    loadNotes();
                     saveStatus.textContent = 'All changes saved';
-                    saveStatus.classList.remove('saving');
+                    lastModified.textContent = `Last edited: ${new Date().toLocaleTimeString()}`;
+                    loadNotes(searchInput.value);
                 }
-            }, 1000);
+            }, 800);
         }
 
-        // Delete note
         function deleteNote() {
-            if (currentNoteId) {
-                const notes = JSON.parse(localStorage.getItem('notes')) || [];
-                const filteredNotes = notes.filter(n => n.id !== currentNoteId);
-                localStorage.setItem('notes', JSON.stringify(filteredNotes));
-                
-                currentNoteId = null;
-                noteTitle.value = '';
-                notepad.value = '';
-                loadNotes();
-            }
-        }
-
-        // Update the loadNotes function
-        function loadNotes() {
+            if (!currentNoteId) return;
             const notes = JSON.parse(localStorage.getItem('notes')) || [];
-            notesList.innerHTML = '';
-            
-            notes.forEach(note => {
-                const noteElement = document.createElement('div');
-                noteElement.className = 'note-item';
-                noteElement.setAttribute('data-id', note.id);
-                noteElement.innerHTML = `
-                    <div class="note-content">
-                        <strong>${note.title || 'Untitled Note'}</strong>
-                        <div>
-                            ${new Date(note.lastModified).toLocaleDateString()} 
-                            ${new Date(note.lastModified).toLocaleTimeString()}
-                        </div>
-                    </div>
-                    <div class="note-actions">
-                        <button class="delete-btn" title="Delete note">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" width="20" height="20">
-                                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
-                            </svg>
-                        </button>
-                    </div>
-                `;
-                
-                // Click handler for the note content
-                noteElement.querySelector('.note-content').addEventListener('click', () => loadNote(note.id));
-                
-                // Delete handler
-                noteElement.querySelector('.delete-btn').addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    if (confirm('Are you sure you want to delete this note?')) {
-                        deleteSpecificNote(note.id);
-                    }
-                });
-                
-                notesList.appendChild(noteElement);
-            });
-
-            // If no note is selected and there are notes, select the first one
-            if (!currentNoteId && notes.length > 0) {
-                loadNote(notes[0].id);
-            }
-        }
-
-        // Add new function for deleting specific notes
-        function deleteSpecificNote(id) {
-            const notes = JSON.parse(localStorage.getItem('notes')) || [];
-            const filteredNotes = notes.filter(n => n.id !== id);
-            localStorage.setItem('notes', JSON.stringify(filteredNotes));
-            
-            if (currentNoteId === id) {
-                currentNoteId = null;
-                noteTitle.value = '';
-                notepad.value = '';
-            }
-            
+            const updated = notes.filter(n => n.id !== currentNoteId);
+            localStorage.setItem('notes', JSON.stringify(updated));
+            currentNoteId = null;
+            noteTitle.value = '';
+            notepad.value = '';
             loadNotes();
         }
 
-        // Theme toggle functionality
+        function updateStats() {
+            const text = notepad.value.trim();
+            const words = text.split(/\s+/).filter(Boolean).length;
+            wordCount.textContent = `Words: ${words}`;
+            charCount.textContent = `Characters: ${text.length}`;
+        }
+
+        // Theme
         function initializeTheme() {
-            // Set dark mode as default
-            if (!localStorage.getItem('theme')) {
-                localStorage.setItem('theme', 'dark');
-                document.body.classList.add('dark-mode');
-            } else {
-                // Load saved preference
-                const isDark = localStorage.getItem('theme') === 'dark';
-                document.body.classList.toggle('dark-mode', isDark);
-            }
-            updateThemeIcon();
+            const theme = localStorage.getItem('theme') || 'light';
+            document.body.classList.toggle('dark-mode', theme === 'dark');
+            themeSwitch.textContent = theme === 'dark' ? '☀️' : '🌙';
         }
 
-        function updateThemeIcon() {
-            const isDark = document.body.classList.contains('dark-mode');
-            const iconContent = isDark ? 
-                `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="24" height="24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-                </svg>` :
-                `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="24" height="24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-                </svg>`;
-            
-            themeSwitch.innerHTML = iconContent;
-        }
-
-        // Theme toggle event listener
         themeSwitch.addEventListener('click', () => {
             document.body.classList.toggle('dark-mode');
             const isDark = document.body.classList.contains('dark-mode');
             localStorage.setItem('theme', isDark ? 'dark' : 'light');
-            updateThemeIcon();
+            themeSwitch.textContent = isDark ? '☀️' : '🌙';
         });
 
-        // Initialize theme on page load
-        initializeTheme();
+        // Download note
+        downloadNoteBtn.addEventListener('click', () => {
+            if (!currentNoteId) return alert('No note selected!');
+            const title = noteTitle.value || 'Untitled Note';
+            const blob = new Blob([notepad.value], { type: 'text/plain' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `${title}.txt`;
+            a.click();
+        });
 
-        // Event listeners
-        notepad.addEventListener('input', autoSave);
+        // Export / Import
+        exportNotesBtn.addEventListener('click', () => {
+            const notes = localStorage.getItem('notes');
+            const blob = new Blob([notes], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'my_notes_backup.json';
+            a.click();
+        });
+
+        importNotesBtn.addEventListener('click', () => importNotesInput.click());
+        importNotesInput.addEventListener('change', e => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = evt => {
+                localStorage.setItem('notes', evt.target.result);
+                loadNotes();
+                alert('Notes imported successfully!');
+            };
+            reader.readAsText(file);
+        });
+
+        // Listeners
+        notepad.addEventListener('input', () => { autoSave(); updateStats(); });
         noteTitle.addEventListener('input', autoSave);
         newNoteBtn.addEventListener('click', createNewNote);
         deleteNoteBtn.addEventListener('click', deleteNote);
+        searchInput.addEventListener('input', e => loadNotes(e.target.value));
+
+        initializeTheme();
+        loadNotes();
     </script>
 </body>
 </html>
