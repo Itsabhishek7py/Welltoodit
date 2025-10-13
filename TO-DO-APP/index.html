@@ -9,157 +9,416 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
-            margin: 0;
             height: 100vh;
             display: flex;
-            background-color: #f5f5f5;
-            transition: background 0.3s, color 0.3s;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
         }
 
         .container {
             display: flex;
             width: 100%;
             height: 100%;
+            padding: 20px;
+            gap: 20px;
         }
 
         .sidebar {
-            width: 280px;
-            background: #fff;
-            border-right: 1px solid #ddd;
+            width: 320px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
             display: flex;
             flex-direction: column;
-            padding: 10px;
+            padding: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            animation: slideInLeft 0.5s ease-out;
+        }
+
+        @keyframes slideInLeft {
+            from { transform: translateX(-100px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .sidebar h2 {
+            font-size: 28px;
+            font-weight: 600;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
         }
 
         .editor-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 0;
+            margin-bottom: 20px;
         }
 
         .btn {
             display: flex;
             align-items: center;
-            gap: 6px;
-            padding: 8px 12px;
-            background: #2563eb;
+            gap: 8px;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 12px;
             cursor: pointer;
             font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .btn:active {
+            transform: translateY(0);
         }
 
         .notes-list {
             flex: 1;
             overflow-y: auto;
-            margin-top: 10px;
+            margin-top: 16px;
+            padding-right: 8px;
+        }
+
+        .notes-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .notes-list::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 10px;
+        }
+
+        .notes-list::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
         }
 
         .note-item {
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 5px;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 10px;
             cursor: pointer;
-            background: #f9fafb;
-            transition: background 0.2s;
+            background: rgba(102, 126, 234, 0.05);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
         }
 
         .note-item.active {
-            background: #dbeafe;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.15));
+            border-color: #667eea;
+            transform: translateX(4px);
         }
 
         .note-item:hover {
-            background: #e5e7eb;
+            background: rgba(102, 126, 234, 0.1);
+            transform: translateX(4px);
+        }
+
+        .note-item strong {
+            color: #1f2937;
+            font-size: 15px;
+        }
+
+        .note-item div {
+            color: #6b7280;
+            font-size: 12px;
+            margin-top: 4px;
         }
 
         .main-content {
             flex: 1;
             display: flex;
             flex-direction: column;
-            padding: 20px;
-            background: #fafafa;
+            padding: 32px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            animation: slideInRight 0.5s ease-out;
         }
 
         #noteTitle {
-            font-size: 18px;
-            padding: 8px;
+            font-size: 32px;
+            font-weight: 600;
+            padding: 12px 0;
             border: none;
             outline: none;
             width: 70%;
-            border-bottom: 1px solid #ccc;
+            border-bottom: 2px solid transparent;
             background: transparent;
+            color: #1f2937;
+            transition: border-color 0.3s ease;
+        }
+
+        #noteTitle:focus {
+            border-bottom-color: #667eea;
         }
 
         #notepad {
             flex: 1;
             width: 100%;
-            margin-top: 10px;
+            margin-top: 24px;
             border: none;
             outline: none;
             font-size: 16px;
-            padding: 10px;
+            line-height: 1.8;
+            padding: 0;
             resize: none;
             background: transparent;
+            color: #374151;
         }
 
-        .save-status, .note-stats, #lastModified {
+        .save-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
             font-size: 13px;
-            color: #666;
+            color: #10b981;
+            font-weight: 500;
+        }
+
+        .save-status::before {
+            content: '✓';
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            background: #10b981;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 18px;
+            font-size: 12px;
+        }
+
+        .note-stats, #lastModified {
+            font-size: 13px;
+            color: #9ca3af;
+            font-weight: 500;
         }
 
         .note-stats {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(102, 126, 234, 0.1);
+        }
+
+        #lastModified {
             margin-top: 8px;
+            margin-bottom: 8px;
         }
 
         .search-bar {
-            width: 90%;
-            padding: 8px;
-            margin: 10px auto;
-            display: block;
-            border: 1px solid #ccc;
-            border-radius: 8px;
+            width: 100%;
+            padding: 14px 18px;
+            margin-bottom: 8px;
+            border: 2px solid rgba(102, 126, 234, 0.2);
+            border-radius: 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .search-bar:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
         }
 
         .backup-controls {
-            margin-top: 10px;
+            margin-top: auto;
+            padding-top: 20px;
             display: flex;
-            gap: 5px;
-            justify-content: space-around;
+            gap: 10px;
+            border-top: 1px solid rgba(102, 126, 234, 0.1);
+        }
+
+        .backup-controls button {
+            flex: 1;
+            padding: 10px;
+            background: rgba(102, 126, 234, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            color: #667eea;
+            transition: all 0.3s ease;
+        }
+
+        .backup-controls button:hover {
+            background: rgba(102, 126, 234, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .icon-btn {
+            padding: 10px 14px;
+            background: rgba(102, 126, 234, 0.1);
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            margin-left: 8px;
+        }
+
+        .icon-btn:hover {
+            background: rgba(102, 126, 234, 0.2);
+            transform: translateY(-2px);
         }
 
         .theme-switch {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
+            bottom: 30px;
+            right: 30px;
             border: none;
-            background: #2563eb;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border-radius: 50%;
-            padding: 10px;
+            width: 56px;
+            height: 56px;
             cursor: pointer;
+            font-size: 24px;
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .theme-switch:hover {
+            transform: translateY(-4px) rotate(15deg);
+            box-shadow: 0 12px 32px rgba(102, 126, 234, 0.6);
         }
 
         /* Dark Mode */
         body.dark-mode {
-            background: #1f2937;
-            color: #f9fafb;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
         }
+
         body.dark-mode .sidebar {
-            background: #111827;
-            border-color: #374151;
+            background: rgba(30, 30, 46, 0.95);
         }
+
+        body.dark-mode .sidebar h2 {
+            background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        body.dark-mode .btn {
+            background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+            box-shadow: 0 4px 15px rgba(167, 139, 250, 0.4);
+        }
+
+        body.dark-mode .btn:hover {
+            box-shadow: 0 6px 20px rgba(167, 139, 250, 0.6);
+        }
+
         body.dark-mode .main-content {
-            background: #1f2937;
+            background: rgba(30, 30, 46, 0.95);
         }
+
+        body.dark-mode #noteTitle,
+        body.dark-mode #notepad {
+            color: #e5e7eb;
+        }
+
+        body.dark-mode #noteTitle:focus {
+            border-bottom-color: #a78bfa;
+        }
+
         body.dark-mode .note-item {
-            background: #374151;
+            background: rgba(167, 139, 250, 0.05);
         }
+
+        body.dark-mode .note-item.active {
+            background: linear-gradient(135deg, rgba(167, 139, 250, 0.15), rgba(236, 72, 153, 0.15));
+            border-color: #a78bfa;
+        }
+
         body.dark-mode .note-item:hover {
-            background: #4b5563;
+            background: rgba(167, 139, 250, 0.1);
+        }
+
+        body.dark-mode .note-item strong {
+            color: #f3f4f6;
+        }
+
+        body.dark-mode .note-item div {
+            color: #9ca3af;
+        }
+
+        body.dark-mode .search-bar {
+            background: rgba(167, 139, 250, 0.05);
+            border-color: rgba(167, 139, 250, 0.2);
+            color: #e5e7eb;
+        }
+
+        body.dark-mode .search-bar:focus {
+            border-color: #a78bfa;
+            background: rgba(30, 30, 46, 0.5);
+        }
+
+        body.dark-mode .backup-controls button {
+            background: rgba(167, 139, 250, 0.1);
+            border-color: rgba(167, 139, 250, 0.3);
+            color: #a78bfa;
+        }
+
+        body.dark-mode .backup-controls button:hover {
+            background: rgba(167, 139, 250, 0.2);
+        }
+
+        body.dark-mode .icon-btn {
+            background: rgba(167, 139, 250, 0.1);
+        }
+
+        body.dark-mode .icon-btn:hover {
+            background: rgba(167, 139, 250, 0.2);
+        }
+
+        body.dark-mode .theme-switch {
+            background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+            box-shadow: 0 8px 24px rgba(167, 139, 250, 0.4);
+        }
+
+        body.dark-mode .theme-switch:hover {
+            box-shadow: 0 12px 32px rgba(167, 139, 250, 0.6);
+        }
+
+        body.dark-mode .note-stats,
+        body.dark-mode #lastModified {
+            color: #6b7280;
+        }
+
+        body.dark-mode .note-stats {
+            border-top-color: rgba(167, 139, 250, 0.1);
         }
     </style>
 </head>
