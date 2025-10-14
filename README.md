@@ -68,4 +68,4 @@ This project is licensed under the MIT License
 .
 Feel free to use, modify, and distribute it in your own projects.
 
-Would you like this exported as a downloadable README.md file? Or help deploying the app with GitHub
+Would you like this exported as a downloadable README.md file? Or help deploying the app with GitHub🔥
