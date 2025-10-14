@@ -8,160 +8,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            margin: 0;
-            height: 100vh;
-            display: flex;
-            background-color: #f5f5f5;
-            transition: background 0.3s, color 0.3s;
-        }
-
-        .container {
-            display: flex;
-            width: 100%;
-            height: 100%;
-        }
-
-        .sidebar {
-            width: 280px;
-            background: #fff;
-            border-right: 1px solid #ddd;
-            display: flex;
-            flex-direction: column;
-            padding: 10px;
-        }
-
-        .editor-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 0;
-        }
-
-        .btn {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 8px 12px;
-            background: #2563eb;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-
-        .notes-list {
-            flex: 1;
-            overflow-y: auto;
-            margin-top: 10px;
-        }
-
-        .note-item {
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 5px;
-            cursor: pointer;
-            background: #f9fafb;
-            transition: background 0.2s;
-        }
-
-        .note-item.active {
-            background: #dbeafe;
-        }
-
-        .note-item:hover {
-            background: #e5e7eb;
-        }
-
-        .main-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
-            background: #fafafa;
-        }
-
-        #noteTitle {
-            font-size: 18px;
-            padding: 8px;
-            border: none;
-            outline: none;
-            width: 70%;
-            border-bottom: 1px solid #ccc;
-            background: transparent;
-        }
-
-        #notepad {
-            flex: 1;
-            width: 100%;
-            margin-top: 10px;
-            border: none;
-            outline: none;
-            font-size: 16px;
-            padding: 10px;
-            resize: none;
-            background: transparent;
-        }
-
-        .save-status, .note-stats, #lastModified {
-            font-size: 13px;
-            color: #666;
-        }
-
-        .note-stats {
-            margin-top: 8px;
-        }
-
-        .search-bar {
-            width: 90%;
-            padding: 8px;
-            margin: 10px auto;
-            display: block;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-        }
-
-        .backup-controls {
-            margin-top: 10px;
-            display: flex;
-            gap: 5px;
-            justify-content: space-around;
-        }
-
-        .theme-switch {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            border: none;
-            background: #2563eb;
-            color: white;
-            border-radius: 50%;
-            padding: 10px;
-            cursor: pointer;
-        }
-
-        /* Dark Mode */
-        body.dark-mode {
-            background: #1f2937;
-            color: #f9fafb;
-        }
-        body.dark-mode .sidebar {
-            background: #111827;
-            border-color: #374151;
-        }
-        body.dark-mode .main-content {
-            background: #1f2937;
-        }
-        body.dark-mode .note-item {
-            background: #374151;
-        }
-        body.dark-mode .note-item:hover {
-            background: #4b5563;
-        }
-    </style>
 </head>
 <body>
     <div class="container">
@@ -175,8 +21,8 @@
             <div class="notes-list" id="notesList"></div>
 
             <div class="backup-controls">
-                <button id="exportNotesBtn">Export</button>
-                <button id="importNotesBtn">Import</button>
+                <button class="btn btn-secondary" id="exportNotesBtn">📤 Export</button>
+                <button class="btn btn-secondary" id="importNotesBtn">📥 Import</button>
                 <input type="file" id="importNotesInput" style="display:none;">
             </div>
         </aside>
@@ -185,9 +31,10 @@
             <div class="editor-header">
                 <input type="text" id="noteTitle" placeholder="Note Title">
                 <span class="save-status" id="saveStatus">All changes saved</span>
-                <div>
+                <div class="action-buttons">
+                    <button class="btn btn-save" id="saveNoteBtn">💾 Save & New</button>
                     <button class="icon-btn" id="downloadNoteBtn" title="Download Note">⬇️</button>
-                    <button class="icon-btn" id="deleteNoteBtn" title="Delete Note">🗑️</button>
+                    <button class="icon-btn" id="deleteNoteBtn" title="Delete Note">🗑️ Delete</button>
                 </div>
             </div>
             <span id="lastModified">Last edited: Never</span>
@@ -214,6 +61,7 @@
         const charCount = document.getElementById('charCount');
         const lastModified = document.getElementById('lastModified');
         const downloadNoteBtn = document.getElementById('downloadNoteBtn');
+        const saveNoteBtn = document.getElementById('saveNoteBtn');
         const exportNotesBtn = document.getElementById('exportNotesBtn');
         const importNotesBtn = document.getElementById('importNotesBtn');
         const importNotesInput = document.getElementById('importNotesInput');
@@ -229,10 +77,11 @@
                 note.content.toLowerCase().includes(filter.toLowerCase())
             );
 
-            filtered.forEach(note => {
+            filtered.forEach((note, index) => {
                 const noteElement = document.createElement('div');
                 noteElement.className = 'note-item';
                 noteElement.setAttribute('data-id', note.id);
+                noteElement.style.animationDelay = `${index * 0.05}s`;
                 noteElement.innerHTML = `
                     <div class="note-content">
                         <strong>${note.title || 'Untitled Note'}</strong>
@@ -246,38 +95,77 @@
         }
 
         function createNewNote() {
-            const note = {
-                id: Date.now(),
-                title: 'Untitled Note',
-                content: '',
-                lastModified: new Date()
-            };
-            const notes = JSON.parse(localStorage.getItem('notes')) || [];
-            notes.unshift(note);
-            localStorage.setItem('notes', JSON.stringify(notes));
-            loadNotes();
-            loadNote(note.id);
-            noteTitle.focus();
+            // Add smooth transition animation
+            const mainContent = document.querySelector('.main-content');
+            mainContent.style.opacity = '0.7';
+            mainContent.style.transform = 'translateY(10px)';
+            
+            setTimeout(() => {
+                const note = {
+                    id: Date.now(),
+                    title: 'Untitled Note',
+                    content: '',
+                    lastModified: new Date()
+                };
+                const notes = JSON.parse(localStorage.getItem('notes')) || [];
+                notes.unshift(note);
+                localStorage.setItem('notes', JSON.stringify(notes));
+                
+                // Clear current note fields
+                noteTitle.value = 'Untitled Note';
+                notepad.value = '';
+                currentNoteId = null;
+                
+                // Load the new note
+                loadNotes();
+                loadNote(note.id);
+                
+                // Focus on title and select text for easy editing
+                noteTitle.focus();
+                noteTitle.select();
+                
+                // Restore main content with animation
+                mainContent.style.opacity = '1';
+                mainContent.style.transform = 'translateY(0)';
+                
+                // Update stats
+                updateStats();
+            }, 150);
         }
 
         function loadNote(id) {
             const notes = JSON.parse(localStorage.getItem('notes')) || [];
             const note = notes.find(n => n.id === id);
             if (note) {
-                currentNoteId = id;
-                noteTitle.value = note.title;
-                notepad.value = note.content;
-                lastModified.textContent = `Last edited: ${new Date(note.lastModified).toLocaleTimeString()}`;
-                document.querySelectorAll('.note-item').forEach(i => i.classList.remove('active'));
-                const el = document.querySelector(`.note-item[data-id="${id}"]`);
-                if (el) el.classList.add('active');
-                updateStats();
+                // Add loading animation to main content
+                const mainContent = document.querySelector('.main-content');
+                mainContent.style.opacity = '0.7';
+                mainContent.style.transform = 'translateY(10px)';
+                
+                setTimeout(() => {
+                    currentNoteId = id;
+                    noteTitle.value = note.title;
+                    notepad.value = note.content;
+                    lastModified.textContent = `Last edited: ${new Date(note.lastModified).toLocaleTimeString()}`;
+                    document.querySelectorAll('.note-item').forEach(i => i.classList.remove('active'));
+                    const el = document.querySelector(`.note-item[data-id="${id}"]`);
+                    if (el) el.classList.add('active');
+                    updateStats();
+                    
+                    // Restore main content
+                    mainContent.style.opacity = '1';
+                    mainContent.style.transform = 'translateY(0)';
+                }, 150);
             }
         }
 
         function autoSave() {
             if (!currentNoteId) return;
+            
+            // Update save status with animation
             saveStatus.textContent = 'Saving...';
+            saveStatus.className = 'save-status saving';
+            
             if (saveTimeout) clearTimeout(saveTimeout);
             saveTimeout = setTimeout(() => {
                 const notes = JSON.parse(localStorage.getItem('notes')) || [];
@@ -290,22 +178,71 @@
                         lastModified: new Date()
                     };
                     localStorage.setItem('notes', JSON.stringify(notes));
-                    saveStatus.textContent = 'All changes saved';
+                    
+                    // Success animation
+                    saveStatus.textContent = '✓ Saved';
+                    saveStatus.className = 'save-status';
+                    
+                    // Reset to default after 2 seconds
+                    setTimeout(() => {
+                        saveStatus.textContent = 'All changes saved';
+                    }, 2000);
+                    
                     lastModified.textContent = `Last edited: ${new Date().toLocaleTimeString()}`;
                     loadNotes(searchInput.value);
                 }
             }, 800);
         }
 
+        function saveAndNewNote() {
+            // Save current note if it exists and has content
+            if (currentNoteId && (noteTitle.value.trim() || notepad.value.trim())) {
+                // Force save the current note
+                const notes = JSON.parse(localStorage.getItem('notes')) || [];
+                const idx = notes.findIndex(n => n.id === currentNoteId);
+                if (idx !== -1) {
+                    notes[idx] = {
+                        ...notes[idx],
+                        title: noteTitle.value || 'Untitled Note',
+                        content: notepad.value,
+                        lastModified: new Date()
+                    };
+                    localStorage.setItem('notes', JSON.stringify(notes));
+                }
+            }
+            
+            // Create new note
+            createNewNote();
+            
+            // Show success feedback
+            saveStatus.textContent = '✓ Saved & new note created!';
+            saveStatus.className = 'save-status';
+            setTimeout(() => {
+                saveStatus.textContent = 'All changes saved';
+            }, 2000);
+        }
+
         function deleteNote() {
             if (!currentNoteId) return;
-            const notes = JSON.parse(localStorage.getItem('notes')) || [];
-            const updated = notes.filter(n => n.id !== currentNoteId);
-            localStorage.setItem('notes', JSON.stringify(updated));
-            currentNoteId = null;
-            noteTitle.value = '';
-            notepad.value = '';
-            loadNotes();
+            
+            // Add confirmation with smooth animation
+            if (!confirm('Are you sure you want to delete this note?')) return;
+            
+            // Animate deletion
+            const noteElement = document.querySelector(`.note-item[data-id="${currentNoteId}"]`);
+            if (noteElement) {
+                noteElement.style.transform = 'scale(0.8)';
+                noteElement.style.opacity = '0';
+                setTimeout(() => {
+                    const notes = JSON.parse(localStorage.getItem('notes')) || [];
+                    const updated = notes.filter(n => n.id !== currentNoteId);
+                    localStorage.setItem('notes', JSON.stringify(updated));
+                    currentNoteId = null;
+                    noteTitle.value = '';
+                    notepad.value = '';
+                    loadNotes();
+                }, 300);
+            }
         }
 
         function updateStats() {
@@ -343,22 +280,75 @@
         // Export / Import
         exportNotesBtn.addEventListener('click', () => {
             const notes = localStorage.getItem('notes');
-            const blob = new Blob([notes], { type: 'application/json' });
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = 'my_notes_backup.json';
-            a.click();
+            if (!notes || notes === '[]') {
+                alert('No notes to export!');
+                return;
+            }
+            
+            // Add loading state
+            exportNotesBtn.textContent = '📤 Exporting...';
+            exportNotesBtn.disabled = true;
+            
+            setTimeout(() => {
+                const blob = new Blob([notes], { type: 'application/json' });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = `my_notes_backup_${new Date().toISOString().split('T')[0]}.json`;
+                a.click();
+                
+                // Reset button
+                exportNotesBtn.textContent = '📤 Export';
+                exportNotesBtn.disabled = false;
+                
+                // Show success feedback
+                saveStatus.textContent = '✓ Notes exported!';
+                saveStatus.className = 'save-status';
+                setTimeout(() => {
+                    saveStatus.textContent = 'All changes saved';
+                }, 2000);
+            }, 500);
         });
 
         importNotesBtn.addEventListener('click', () => importNotesInput.click());
         importNotesInput.addEventListener('change', e => {
             const file = e.target.files[0];
             if (!file) return;
+            
+            // Add loading state
+            importNotesBtn.textContent = '📥 Importing...';
+            importNotesBtn.disabled = true;
+            
             const reader = new FileReader();
             reader.onload = evt => {
-                localStorage.setItem('notes', evt.target.result);
-                loadNotes();
-                alert('Notes imported successfully!');
+                try {
+                    const importedData = JSON.parse(evt.target.result);
+                    if (Array.isArray(importedData)) {
+                        localStorage.setItem('notes', evt.target.result);
+                        loadNotes();
+                        
+                        // Success feedback
+                        saveStatus.textContent = `✓ ${importedData.length} notes imported!`;
+                        saveStatus.className = 'save-status';
+                        setTimeout(() => {
+                            saveStatus.textContent = 'All changes saved';
+                        }, 3000);
+                    } else {
+                        throw new Error('Invalid file format');
+                    }
+                } catch (error) {
+                    alert('Error importing notes. Please make sure the file is a valid notes backup.');
+                    saveStatus.textContent = '✗ Import failed';
+                    saveStatus.className = 'save-status error';
+                    setTimeout(() => {
+                        saveStatus.textContent = 'All changes saved';
+                        saveStatus.className = 'save-status';
+                    }, 3000);
+                }
+                
+                // Reset button
+                importNotesBtn.textContent = '📥 Import';
+                importNotesBtn.disabled = false;
+                e.target.value = ''; // Reset file input
             };
             reader.readAsText(file);
         });
@@ -367,8 +357,54 @@
         notepad.addEventListener('input', () => { autoSave(); updateStats(); });
         noteTitle.addEventListener('input', autoSave);
         newNoteBtn.addEventListener('click', createNewNote);
+        saveNoteBtn.addEventListener('click', saveAndNewNote);
         deleteNoteBtn.addEventListener('click', deleteNote);
         searchInput.addEventListener('input', e => loadNotes(e.target.value));
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            // Ctrl/Cmd + N for new note
+            if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
+                e.preventDefault();
+                createNewNote();
+            }
+            
+            // Ctrl/Cmd + Shift + S for save and new note
+            if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'S') {
+                e.preventDefault();
+                saveAndNewNote();
+            }
+            
+            // Ctrl/Cmd + S for save (prevent default browser save)
+            if ((e.ctrlKey || e.metaKey) && e.key === 's' && !e.shiftKey) {
+                e.preventDefault();
+                autoSave();
+            }
+            
+            // Ctrl/Cmd + E for export
+            if ((e.ctrlKey || e.metaKey) && e.key === 'e') {
+                e.preventDefault();
+                exportNotesBtn.click();
+            }
+            
+            // Delete key for deleting note
+            if (e.key === 'Delete' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+                deleteNote();
+            }
+        });
+
+        // Add smooth scroll behavior
+        document.documentElement.style.scrollBehavior = 'smooth';
+
+        // Initialize app with fade-in animation
+        document.body.style.opacity = '0';
+        document.body.style.transform = 'translateY(20px)';
+        
+        setTimeout(() => {
+            document.body.style.transition = 'all 0.6s ease';
+            document.body.style.opacity = '1';
+            document.body.style.transform = 'translateY(0)';
+        }, 100);
 
         initializeTheme();
         loadNotes();

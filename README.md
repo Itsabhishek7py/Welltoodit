@@ -58,7 +58,12 @@ Clean, responsive, and distraction-free design for a smooth user experience on a
 
 ## 📸 Demo Preview 📸
 
-(Add a screenshot or GIF of your app here 📷🎞️)
+**PREVIEW**
+
+Here's a screenshot of the To-Do App:
+
+![To-Do App Preview](./TO-DO-APP/todoapp.jpg)
+
 
 If you found this project helpful, please consider starring the repository and sharing it with others. Your support is appreciated! 🌟
 
