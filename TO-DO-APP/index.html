@@ -310,7 +310,7 @@
 
         function updateStats() {
             const text = notepad.value.trim();
-            const words = text.split(/\s+/).filter(Boolean).length;
+            const words = text.match(/\b\w+\b/g)?.length || 0;
             wordCount.textContent = `Words: ${words}`;
             charCount.textContent = `Characters: ${text.length}`;
         }
