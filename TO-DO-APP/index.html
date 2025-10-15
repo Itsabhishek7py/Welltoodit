@@ -275,27 +275,45 @@
             }
         }
 
-        function autoSave() {
-            if (!currentNoteId) return;
-            saveStatus.textContent = 'Saving...';
-            if (saveTimeout) clearTimeout(saveTimeout);
-            saveTimeout = setTimeout(() => {
-                const notes = JSON.parse(localStorage.getItem('notes')) || [];
-                const idx = notes.findIndex(n => n.id === currentNoteId);
-                if (idx !== -1) {
-                    notes[idx] = {
-                        ...notes[idx],
-                        title: noteTitle.value || 'Untitled Note',
-                        content: notepad.value,
-                        lastModified: new Date()
-                    };
-                    localStorage.setItem('notes', JSON.stringify(notes));
-                    saveStatus.textContent = 'All changes saved';
-                    lastModified.textContent = `Last edited: ${new Date().toLocaleTimeString()}`;
-                    loadNotes(searchInput.value);
-                }
-            }, 800);
+       function autoSave() {
+    if (!currentNoteId) return;
+    saveStatus.textContent = 'Saving...';
+    if (saveTimeout) clearTimeout(saveTimeout);
+    saveTimeout = setTimeout(() => {
+        const notes = JSON.parse(localStorage.getItem('notes')) || [];
+        const idx = notes.findIndex(n => n.id === currentNoteId);
+        if (idx !== -1) {
+            notes[idx] = {
+                ...notes[idx],
+                title: noteTitle.value || 'Untitled Note',
+                content: notepad.value,
+                scrollPos: notepad.scrollTop, // SALVA POSIÇÃO
+                lastModified: new Date()
+            };
+            localStorage.setItem('notes', JSON.stringify(notes));
+            saveStatus.textContent = '✅ All changes saved';
+            lastModified.textContent = `Last edited: ${new Date().toLocaleTimeString()}`;
+            loadNotes(searchInput.value);
         }
+    }, 800);
+}
+
+function loadNote(id) {
+    const notes = JSON.parse(localStorage.getItem('notes')) || [];
+    const note = notes.find(n => n.id === id);
+    if (note) {
+        currentNoteId = id;
+        noteTitle.value = note.title;
+        notepad.value = note.content;
+        notepad.scrollTop = note.scrollPos || 0; // RESTAURA POSIÇÃO
+        lastModified.textContent = `Last edited: ${new Date(note.lastModified).toLocaleTimeString()}`;
+        document.querySelectorAll('.note-item').forEach(i => i.classList.remove('active'));
+        const el = document.querySelector(`.note-item[data-id="${id}"]`);
+        if (el) el.classList.add('active');
+        updateStats();
+    }
+}
+
 
         function deleteNote() {
             if (!currentNoteId) return;
