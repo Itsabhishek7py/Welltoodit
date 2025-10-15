@@ -25,7 +25,9 @@
         }
 
         .sidebar {
-            width: 280px;
+            width: 260px;
+            min-width: 220px;
+            max-width: 280px;
             background: #fff;
             border-right: 1px solid #ddd;
             display: flex;
@@ -298,7 +300,7 @@
         }
 
         function deleteNote() {
-            if (!currentNoteId) return;
+            if (!currentNoteId) return alert('No note selected to delete!') ;
             const notes = JSON.parse(localStorage.getItem('notes')) || [];
             const updated = notes.filter(n => n.id !== currentNoteId);
             localStorage.setItem('notes', JSON.stringify(updated));

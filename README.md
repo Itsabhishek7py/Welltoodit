@@ -50,7 +50,7 @@ Clean, responsive, and distraction-free design for a smooth user experience on a
 ## 🎯 Why You'll Love It ❤️
 
 ✔️ Super easy to use 🖱️  
-✔️ Saves your tasks automatically 💾  
+✔️  Automatically saves your tasks 💾  
 ✔️ Lightweight and fast ⚡  
 ✔️ Keeps you productive every day 📈✨  
 
