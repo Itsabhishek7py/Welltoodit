@@ -298,7 +298,9 @@
         }
 
         function deleteNote() {
-            if (!currentNoteId) return;
+            if (!currentNoteId) return alert('No note selected to delete!');
+            const confirmDelete = confirm('Are you sure you want to delete this note?');
+            if (!confirmDelete) return;
             const notes = JSON.parse(localStorage.getItem('notes')) || [];
             const updated = notes.filter(n => n.id !== currentNoteId);
             localStorage.setItem('notes', JSON.stringify(updated));
