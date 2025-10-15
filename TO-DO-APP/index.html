@@ -278,7 +278,7 @@
         }
 
         function autoSave() {
-            if (!currentNoteId) return;
+            if (!currentNoteId) return alert('No note selected to delete!');
             saveStatus.textContent = 'Saving...';
             if (saveTimeout) clearTimeout(saveTimeout);
             saveTimeout = setTimeout(() => {
