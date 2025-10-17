@@ -1,36 +1,51 @@
-/* Modern To-Do App Styles */
+
 :root {
     --primary: #6366f1;
     --primary-dark: #4338ca;
     --accent: #f472b6;
+
     --bg: #f8fafc;
     --bg-dark: #18181b;
+
     --card-bg: #fff;
     --card-bg-dark: #23232b;
+
     --text: #22223b;
     --text-dark: #f4f4f5;
+
     --muted: #64748b;
     --muted-dark: #a1a1aa;
+
     --border: #e5e7eb;
     --border-dark: #27272a;
-    --shadow: 0 4px 24px rgba(0,0,0,0.08);
+
+    --shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
 }
 
+
 body {
-    background: linear-gradient(120deg, var(--bg), #e0e7ff 100%);
-    color: var(--text);
+    --bg-current: var(--bg);
+    --text-current: var(--text);
+    --card-current: var(--card-bg);
+    --border-current: var(--border);
+    background: linear-gradient(120deg, var(--bg-current), #e0e7ff 100%);
+    color: var(--text-current);
     font-family: 'Inter', sans-serif;
     margin: 0;
     min-height: 100vh;
-    transition: background 0.3s, color 0.3s;
+    transition: all 0.3s ease;
 }
+
 body.dark-mode {
-    background: linear-gradient(120deg, var(--bg-dark), #23232b 100%);
-    color: var(--text-dark);
+    --bg-current: var(--bg-dark);
+    --text-current: var(--text-dark);
+    --card-current: var(--card-bg-dark);
+    --border-current: var(--border-dark);
+    background: linear-gradient(120deg, var(--bg-current), #23232b 100%);
 }
 
 .container {
-    background: var(--card-bg);
+    background: var(--card-current);
     border-radius: 18px;
     box-shadow: var(--shadow);
     margin: 2rem auto;
@@ -38,23 +53,18 @@ body.dark-mode {
     overflow: hidden;
     display: flex;
     min-height: 600px;
-    transition: background 0.3s;
+    transition: all 0.3s ease;
 }
-body.dark-mode .container {
-    background: var(--card-bg-dark);
-}
+
 
 .sidebar {
     background: transparent;
-    border-right: 1px solid var(--border);
+    border-right: 1px solid var(--border-current);
     padding: 2rem 1.5rem;
     width: 320px;
     min-width: 260px;
-    transition: border 0.3s;
 }
-body.dark-mode .sidebar {
-    border-right: 1px solid var(--border-dark);
-}
+
 
 .editor-header {
     display: flex;
@@ -68,10 +78,8 @@ body.dark-mode .sidebar {
     color: var(--primary);
     margin: 0;
 }
-body.dark-mode .editor-header h2 {
-    color: var(--primary);
-}
 
+/* 🎛️ Buttons */
 .btn {
     background: linear-gradient(90deg, var(--primary), var(--accent));
     color: #fff;
@@ -81,8 +89,8 @@ body.dark-mode .editor-header h2 {
     font-size: 1rem;
     font-weight: 500;
     cursor: pointer;
-    box-shadow: 0 2px 8px rgba(99,102,241,0.08);
-    transition: background 0.2s, transform 0.2s;
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.08);
+    transition: all 0.2s ease;
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -91,7 +99,6 @@ body.dark-mode .editor-header h2 {
     background: linear-gradient(90deg, var(--primary-dark), var(--accent));
     transform: translateY(-2px) scale(1.03);
 }
-
 .notes-list {
     overflow-y: auto;
     max-height: 60vh;
@@ -100,31 +107,30 @@ body.dark-mode .editor-header h2 {
     background: #f1f5f9;
     border-radius: 10px;
     margin-bottom: 1rem;
-    padding: 1rem 1rem 0.8rem 1rem;
+    padding: 1rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
-    border: 1px solid var(--border);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    border: 1px solid var(--border-current);
     cursor: pointer;
-    transition: background 0.2s, box-shadow 0.2s, border 0.2s;
+    transition: all 0.2s ease;
 }
 .note-item.active {
     background: linear-gradient(90deg, var(--primary), var(--accent));
     color: #fff;
     border: 1.5px solid var(--primary);
-    box-shadow: 0 4px 16px rgba(99,102,241,0.12);
+    box-shadow: 0 4px 16px rgba(99, 102, 241, 0.12);
 }
 body.dark-mode .note-item {
     background: #23232b;
     color: var(--text-dark);
-    border: 1px solid var(--border-dark);
 }
 body.dark-mode .note-item.active {
     background: linear-gradient(90deg, var(--primary-dark), var(--accent));
-    color: #fff;
     border: 1.5px solid var(--primary-dark);
 }
+
 .note-content strong {
     font-size: 1rem;
     font-weight: 600;
@@ -145,7 +151,7 @@ body.dark-mode .note-content div {
     border-radius: 6px;
     padding: 0.3rem 0.5rem;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: background 0.2s ease;
 }
 .delete-btn:hover {
     background: #fdf2f8;
@@ -165,35 +171,28 @@ body.dark-mode .delete-btn:hover {
     font-size: 1.3rem;
     padding: 0.7rem 1rem;
     border-radius: 8px;
-    border: 1px solid var(--border);
-    background: #fff;
-    color: var(--text);
+    border: 1px solid var(--border-current);
+    background: var(--card-current);
+    color: var(--text-current);
     margin-right: 1rem;
     width: 60%;
-    transition: border 0.2s, background 0.2s;
-}
-body.dark-mode #noteTitle {
-    background: #23232b;
-    color: var(--text-dark);
-    border: 1px solid var(--border-dark);
+    transition: all 0.2s ease;
 }
 #notepad {
     margin-top: 1.5rem;
     border-radius: 12px;
-    border: 1px solid var(--border);
+    border: 1px solid var(--border-current);
     background: #f9fafb;
-    color: var(--text);
+    color: var(--text-current);
     font-size: 1.1rem;
     padding: 1.5rem;
     min-height: 300px;
     resize: vertical;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-    transition: border 0.2s, background 0.2s;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    transition: all 0.2s ease;
 }
 body.dark-mode #notepad {
     background: #23232b;
-    color: var(--text-dark);
-    border: 1px solid var(--border-dark);
 }
 .save-status {
     color: var(--primary);
