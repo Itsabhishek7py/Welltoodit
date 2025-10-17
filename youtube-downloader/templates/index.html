@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>YT Downloader</title>
+    <link rel="stylesheet" href="/static/styles.css">
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>🎬 YT Downloader</h1>
+        <p>Download YouTube videos or audio in multiple formats and qualities.</p>
+      </header>
+
+      <main>
+        <div class="card">
+          <label for="url">YouTube URL</label>
+          <input id="url" placeholder="https://www.youtube.com/watch?v=..." />
+          <div class="row">
+            <button id="probe">Probe Formats</button>
+          </div>
+        </div>
+
+        <div id="info" class="card hidden">
+          <h2 id="title"></h2>
+          <p id="meta"></p>
+          <div id="formatsTable"></div>
+        </div>
+      </main>
+
+      <footer>
+        <small>Built with yt-dlp and FastAPI</small>
+      </footer>
+    </div>
+    <script src="/static/app.js"></script>
+  </body>
+</html>
