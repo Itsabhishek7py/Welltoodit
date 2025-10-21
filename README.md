@@ -76,4 +76,4 @@ This project is licensed under the **MIT License**.
 
 ---
 
-### 🧠 **Made with Passion & JavaScript 💛**
+### 🧠 **Made with Passion & JavaScript 💛🤍**
