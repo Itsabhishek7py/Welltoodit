@@ -63,7 +63,7 @@ Say goodbye to messy sticky notes 🗒️ and hello to a **simple, smart, and st
 
 If you liked this project —  
 ⭐ **Star this repo** to show your support!  
-🔗 **Fork it** to build your own version  
+🔗 **Fork it** to build your own version. 
 🐛 **Report issues** or suggest features — feedback is always welcome!  
 
 ---
