@@ -1,163 +1,180 @@
-
-<!doctype html>
-
+ <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Image → Text (OCR) — Single File</title>
-  <style>
-    :root{font-family:system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial;}
-    body{max-width:900px;margin:28px auto;padding:18px;line-height:1.45;color:#111}
-    h1{font-size:20px;margin:0 0 8px}
-    .card{border:1px solid #e6e6e6;border-radius:10px;padding:14px;background:#fff}
-    #drop{border:2px dashed #cfcfcf;border-radius:8px;padding:18px;text-align:center;cursor:pointer}
-    #drop.dragover{background:#f7fbff;border-color:#3b82f6}
-    img#preview{max-width:100%;max-height:360px;display:block;margin:12px auto;border-radius:6px}
-    .controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-    button{padding:8px 12px;border-radius:8px;border:1px solid #ddd;background:#fafafa;cursor:pointer}
-    button.primary{background:#111;color:#fff;border-color:#111}
-    progress{width:100%;height:14px}
-    textarea{width:100%;height:240px;padding:10px;margin-top:12px;border-radius:8px;border:1px solid #ddd;font-family:monospace}
-    .muted{color:#666;font-size:13px}
-    .row{display:flex;gap:10px;align-items:center}
-    @media (max-width:520px){.controls{flex-direction:column}}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image to Text Converter</title>
+    <script src="https://unpkg.com/tesseract.js@v4.1.1/dist/tesseract.min.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .app-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            color: #4a5568;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+
+        .upload-section {
+            margin-bottom: 30px;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .upload-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .upload-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .convert-button {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.2s ease;
+            box-shadow: 0 4px 12px rgba(72, 187, 120, 0.3);
+        }
+
+        .convert-button:hover:not(:disabled) {
+            background: linear-gradient(135deg, #38a169 0%, #2f855a 100%);
+        }
+
+        .convert-button:disabled {
+            background: #a0aec0;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        #preview {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 10px;
+            margin: 20px 0;
+            display: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .loading {
+            display: none;
+            color: #667eea;
+            font-style: italic;
+            margin: 20px 0;
+        }
+
+        #result {
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            min-height: 100px;
+            text-align: left;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            font-size: 1em;
+            display: none;
+        }
+
+        .error {
+            color: #e53e3e;
+            background: #fed7d7;
+            border-color: #fc8181;
+        }
+    </style>
 </head>
 <body>
-  <h1>Image → Text (OCR)</h1>
-  <p class="muted">Client-side OCR using <strong>Tesseract.js</strong>. Works offline in the browser after initial script download. Drop an image or choose a file, then click <em>Recognize</em>.</p>  <div class="card">
-    <div id="drop">Drop image here or <label style="color:blue;cursor:pointer"><input id="fileInput" type="file" accept="image/*" style="display:none">choose file</label></div>
-    <img id="preview" alt="preview" style="display:none"><div class="controls">
-  <div class="row" style="flex:1">
-    <label for="lang">Language:</label>
-    <select id="lang">
-      <option value="eng" selected>English (eng)</option>
-      <option value="spa">Spanish (spa)</option>
-      <option value="fra">French (fra)</option>
-      <option value="deu">German (deu)</option>
-      <!-- Add more if you load the traineddata for them -->
-    </select>
-  </div>
+    <div class="app-container">
+        <h1>🖼️ Image to Text Converter</h1>
+        <div class="upload-section">
+            <input type="file" id="imageInput" accept="image/*">
+            <label for="imageInput" class="upload-button">Choose an Image</label>
+            <button id="convertBtn" class="convert-button" disabled>Convert to Text</button>
+        </div>
+        <img id="preview" alt="Image Preview">
+        <div id="loading" class="loading">Converting image to text... Please wait.</div>
+        <div id="result"></div>
+    </div>
 
-  <div class="row">
-    <button id="recognizeBtn" class="primary">Recognize</button>
-    <button id="clearBtn">Clear</button>
-    <button id="copyBtn">Copy</button>
-    <button id="downloadBtn">Download .txt</button>
-  </div>
-</div>
+    <script>
+        const imageInput = document.getElementById('imageInput');
+        const preview = document.getElementById('preview');
+        const convertBtn = document.getElementById('convertBtn');
+        const loading = document.getElementById('loading');
+        const result = document.getElementById('result');
 
-<div style="margin-top:12px">
-  <label class="muted">Progress</label>
-  <progress id="progress" value="0" max="1" style="display:block"></progress>
-  <div id="status" class="muted">Idle</div>
-</div>
+        imageInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                    convertBtn.disabled = false;
+                    result.style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
 
-<textarea id="output" placeholder="Recognized text will appear here..."></textarea>
+        convertBtn.addEventListener('click', async () => {
+            const file = imageInput.files[0];
+            if (!file) return;
 
-  </div>  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.1.1/dist/tesseract.min.js"></script>  <script>
-    // Simple single-file Image→Text converter using tesseract.js
-    const drop = document.getElementById('drop');
-    const fileInput = document.getElementById('fileInput');
-    const preview = document.getElementById('preview');
-    const recognizeBtn = document.getElementById('recognizeBtn');
-    const clearBtn = document.getElementById('clearBtn');
-    const copyBtn = document.getElementById('copyBtn');
-    const downloadBtn = document.getElementById('downloadBtn');
-    const output = document.getElementById('output');
-    const progressEl = document.getElementById('progress');
-    const status = document.getElementById('status');
-    const langSelect = document.getElementById('lang');
+            convertBtn.disabled = true;
+            loading.style.display = 'block';
+            result.style.display = 'block';
+            result.textContent = '';
+            result.classList.remove('error');
 
-    let currentImageBlob = null;
-
-    function prevent(e){e.preventDefault();e.stopPropagation();}
-    ['dragenter','dragover','dragleave','drop'].forEach(ev=>{
-      drop.addEventListener(ev,prevent);
-    });
-
-    drop.addEventListener('dragover',()=>drop.classList.add('dragover'));
-    drop.addEventListener('dragleave',()=>drop.classList.remove('dragover'));
-    drop.addEventListener('drop',e=>{
-      drop.classList.remove('dragover');
-      const f = e.dataTransfer.files && e.dataTransfer.files[0];
-      if(f) handleFile(f);
-    });
-
-    drop.addEventListener('click',()=>fileInput.click());
-    fileInput.addEventListener('change',e=>{
-      const f = e.target.files[0]; if(f) handleFile(f);
-    });
-
-    function handleFile(file){
-      if(!file.type.startsWith('image/')){alert('Please provide an image file.');return}
-      currentImageBlob = file;
-      const url = URL.createObjectURL(file);
-      preview.src = url; preview.style.display = 'block';
-      output.value = ''; progressEl.value = 0; status.textContent = 'Image loaded.';
-    }
-
-    clearBtn.addEventListener('click',()=>{
-      preview.style.display='none'; preview.src=''; output.value=''; currentImageBlob=null; status.textContent='Cleared.'; progressEl.value=0;
-    });
-
-    copyBtn.addEventListener('click',()=>{
-      if(!output.value) return alert('No text to copy.');
-      navigator.clipboard.writeText(output.value).then(()=>{alert('Copied to clipboard')}).catch(()=>{alert('Copy failed')});
-    });
-
-    downloadBtn.addEventListener('click',()=>{
-      if(!output.value) return alert('No text to download.');
-      const blob = new Blob([output.value],{type:'text/plain'});
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'ocr-output.txt';
-      document.body.appendChild(a); a.click(); a.remove();
-    });
-
-    recognizeBtn.addEventListener('click',async ()=>{
-      if(!currentImageBlob) return alert('Drop or select an image first.');
-      recognizeBtn.disabled = true; status.textContent='Starting OCR...';
-      output.value = '';
-
-      const worker = Tesseract.createWorker({
-        logger: m => {
-          // update progress
-          if(m.status && m.progress!=null){
-            progressEl.value = m.progress;
-            status.textContent = `${m.status} — ${Math.round(m.progress*100)}%`;
-          } else if(m.status){
-            status.textContent = m.status;
-          }
-        }
-      });
-
-      try{
-        await worker.load();
-        const lang = langSelect.value || 'eng';
-        await worker.loadLanguage(lang);
-        await worker.initialize(lang);
-        // convert blob -> dataURL for Tesseract
-        const imgDataUrl = await blobToDataURL(currentImageBlob);
-        const { data: { text } } = await worker.recognize(imgDataUrl);
-        output.value = text.trim();
-        status.textContent = 'Done'; progressEl.value = 1;
-      }catch(err){
-        console.error(err); alert('OCR failed: '+err.message);
-        status.textContent = 'Error';
-      } finally{
-        await worker.terminate();
-        recognizeBtn.disabled = false;
-      }
-    });
-
-    function blobToDataURL(blob){
-      return new Promise((res,rej)=>{
-        const r = new FileReader(); r.onload = ()=>res(r.result); r.onerror = rej; r.readAsDataURL(blob);
-      });
-    }
-
-    // if results are garbled, try higher-resolution images or selecting a closer language.
-  </script></body>
+            try {
+                const { data: { text } } = await Tesseract.recognize(file, 'eng', {
+                    logger: m => console.log(m)
+                });
+                result.textContent = text;
+            } catch (error) {
+                result.textContent = 'Error converting image to text: ' + error.message;
+                result.classList.add('error');
+            } finally {
+                loading.style.display = 'none';
+                convertBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
 </html>
