@@ -179,16 +179,25 @@
                 <button id="importNotesBtn">Import</button>
                 <input type="file" id="importNotesInput" style="display:none;">
             </div>
+            
+            <div class="trash-controls" style="margin-top: 10px; display: flex; flex-direction: column; align-items: center; gap: 5px;">
+                <button id="viewTrashBtn" class="btn" style="background: #64748b; width: 90%;">View Trash 🗑️</button>
+                <button id="backToNotesBtn" class="btn" style="display:none; width: 90%;">Back to Notes 📝</button>
+            </div>
+            
         </aside>
 
         <main class="main-content">
             <div class="editor-header">
                 <input type="text" id="noteTitle" placeholder="Note Title">
                 <span class="save-status" id="saveStatus">All changes saved</span>
+                
                 <div>
+                    <button class="icon-btn" id="restoreNoteBtn" title="Restore Note" style="display:none; font-size: 1.1rem; background: #22c55e; color: white; border: none; border-radius: 8px; padding: 5px 10px; cursor: pointer; margin-right: 5px;">♻️ Restore</button>
                     <button class="icon-btn" id="downloadNoteBtn" title="Download Note">⬇️</button>
                     <button class="icon-btn" id="deleteNoteBtn" title="Delete Note">🗑️</button>
                 </div>
+
             </div>
             <span id="lastModified">Last edited: Never</span>
             <textarea id="notepad" placeholder="Start writing..."></textarea>
@@ -218,16 +227,29 @@
         const importNotesBtn = document.getElementById('importNotesBtn');
         const importNotesInput = document.getElementById('importNotesInput');
 
+        // NEW VARIABLES ADDED
+        const viewTrashBtn = document.getElementById('viewTrashBtn');
+        const backToNotesBtn = document.getElementById('backToNotesBtn');
+        const restoreNoteBtn = document.getElementById('restoreNoteBtn');
+
         let currentNoteId = null;
         let saveTimeout = null;
+        let isViewingTrash = false; // NEW STATE VARIABLE
 
+        
+        // --- loadNotes function REPLACED ---
         function loadNotes(filter = '') {
-            const notes = JSON.parse(localStorage.getItem('notes')) || [];
+            const storageKey = isViewingTrash ? 'trashedNotes' : 'notes';
+            const notes = JSON.parse(localStorage.getItem(storageKey)) || [];
             notesList.innerHTML = '';
+            
             const filtered = notes.filter(note =>
                 note.title.toLowerCase().includes(filter.toLowerCase()) ||
                 note.content.toLowerCase().includes(filter.toLowerCase())
             );
+            
+            // Sort by last modified date, newest first
+            filtered.sort((a, b) => new Date(b.lastModified) - new Date(a.lastModified));
 
             filtered.forEach(note => {
                 const noteElement = document.createElement('div');
@@ -236,13 +258,29 @@
                 noteElement.innerHTML = `
                     <div class="note-content">
                         <strong>${note.title || 'Untitled Note'}</strong>
-                        <div>${new Date(note.lastModified).toLocaleDateString()} ${new Date(note.lastModified).toLocaleTimeString()}</div>
+                        <div>${isViewingTrash ? 'Deleted' : 'Edited'}: ${new Date(note.lastModified).toLocaleDateString()} ${new Date(note.lastModified).toLocaleTimeString()}</div>
                     </div>`;
                 noteElement.addEventListener('click', () => loadNote(note.id));
                 notesList.appendChild(noteElement);
             });
 
-            if (!currentNoteId && notes.length > 0) loadNote(notes[0].id);
+            // Auto-load first note or clear editor
+            const noteToLoad = filtered.length > 0 ? filtered[0].id : null;
+            
+            if (currentNoteId && filtered.some(n => n.id === currentNoteId)) {
+                // Current note is still in the list, just ensure it's loaded
+                loadNote(currentNoteId);
+            } else if (noteToLoad) {
+                loadNote(noteToLoad);
+            } else {
+                // No notes left in this view
+                currentNoteId = null;
+                noteTitle.value = isViewingTrash ? 'Trash is Empty' : 'Create a new note';
+                notepad.value = '';
+                lastModified.textContent = '';
+                updateStats();
+                updateEditorUI();
+            }
         }
 
         function createNewNote() {
@@ -259,71 +297,92 @@
             loadNote(note.id);
             noteTitle.focus();
         }
+        
+        // --- autoSave function (Original) ---
+        function autoSave() {
+            if (!currentNoteId || isViewingTrash) return; // Don't save if in trash view
+            saveStatus.textContent = 'Saving...';
+            if (saveTimeout) clearTimeout(saveTimeout);
+            saveTimeout = setTimeout(() => {
+                const notes = JSON.parse(localStorage.getItem('notes')) || [];
+                const idx = notes.findIndex(n => n.id === currentNoteId);
+                if (idx !== -1) {
+                    notes[idx] = {
+                        ...notes[idx],
+                        title: noteTitle.value || 'Untitled Note',
+                        content: notepad.value,
+                        scrollPos: notepad.scrollTop, // SALVA POSIÇÃO
+                        lastModified: new Date()
+                    };
+                    localStorage.setItem('notes', JSON.stringify(notes));
+                    saveStatus.textContent = '✅ All changes saved';
+                    lastModified.textContent = `Last edited: ${new Date().toLocaleTimeString()}`;
+                    
+                    // Only reload list if note title changed
+                    const sidebarItem = document.querySelector(`.note-item[data-id="${currentNoteId}"] strong`);
+                    if (sidebarItem && sidebarItem.textContent !== (noteTitle.value || 'Untitled Note')) {
+                         loadNotes(searchInput.value);
+                    }
+                }
+            }, 800);
+        }
 
+        // --- loadNote function REPLACED ---
+        // (The original file had this function twice, this one replaces both)
         function loadNote(id) {
-            const notes = JSON.parse(localStorage.getItem('notes')) || [];
+            const storageKey = isViewingTrash ? 'trashedNotes' : 'notes';
+            const notes = JSON.parse(localStorage.getItem(storageKey)) || [];
             const note = notes.find(n => n.id === id);
+            
             if (note) {
                 currentNoteId = id;
                 noteTitle.value = note.title;
                 notepad.value = note.content;
+                notepad.scrollTop = note.scrollPos || 0; // Restore scroll position
                 lastModified.textContent = `Last edited: ${new Date(note.lastModified).toLocaleTimeString()}`;
+                
                 document.querySelectorAll('.note-item').forEach(i => i.classList.remove('active'));
                 const el = document.querySelector(`.note-item[data-id="${id}"]`);
                 if (el) el.classList.add('active');
+                
                 updateStats();
+            } else {
+                currentNoteId = null;
             }
+            updateEditorUI(); // Update UI based on view (trash or active)
         }
 
-       function autoSave() {
-    if (!currentNoteId) return;
-    saveStatus.textContent = 'Saving...';
-    if (saveTimeout) clearTimeout(saveTimeout);
-    saveTimeout = setTimeout(() => {
-        const notes = JSON.parse(localStorage.getItem('notes')) || [];
-        const idx = notes.findIndex(n => n.id === currentNoteId);
-        if (idx !== -1) {
-            notes[idx] = {
-                ...notes[idx],
-                title: noteTitle.value || 'Untitled Note',
-                content: notepad.value,
-                scrollPos: notepad.scrollTop, // SALVA POSIÇÃO
-                lastModified: new Date()
-            };
-            localStorage.setItem('notes', JSON.stringify(notes));
-            saveStatus.textContent = '✅ All changes saved';
-            lastModified.textContent = `Last edited: ${new Date().toLocaleTimeString()}`;
-            loadNotes(searchInput.value);
-        }
-    }, 800);
-}
 
-function loadNote(id) {
-    const notes = JSON.parse(localStorage.getItem('notes')) || [];
-    const note = notes.find(n => n.id === id);
-    if (note) {
-        currentNoteId = id;
-        noteTitle.value = note.title;
-        notepad.value = note.content;
-        notepad.scrollTop = note.scrollPos || 0; // RESTAURA POSIÇÃO
-        lastModified.textContent = `Last edited: ${new Date(note.lastModified).toLocaleTimeString()}`;
-        document.querySelectorAll('.note-item').forEach(i => i.classList.remove('active'));
-        const el = document.querySelector(`.note-item[data-id="${id}"]`);
-        if (el) el.classList.add('active');
-        updateStats();
-    }
-}
-
-
+        // --- deleteNote function REPLACED ---
         function deleteNote() {
             if (!currentNoteId) return;
-            const notes = JSON.parse(localStorage.getItem('notes')) || [];
-            const updated = notes.filter(n => n.id !== currentNoteId);
-            localStorage.setItem('notes', JSON.stringify(updated));
-            currentNoteId = null;
-            noteTitle.value = '';
-            notepad.value = '';
-            loadNotes();
+            
+            if (isViewingTrash) {
+                // Permanently delete from trash
+                if (!confirm('Are you sure you want to permanently delete this note? This action cannot be undone.')) return;
+                
+                let trashedNotes = JSON.parse(localStorage.getItem('trashedNotes')) || [];
+                trashedNotes = trashedNotes.filter(n => n.id !== currentNoteId);
+                localStorage.setItem('trashedNotes', JSON.stringify(trashedNotes));
+                
+            } else {
+                // Move from active notes to trash
+                let notes = JSON.parse(localStorage.getItem('notes')) || [];
+                let trashedNotes = JSON.parse(localStorage.getItem('trashedNotes')) || [];
+                
+                const noteToTrash = notes.find(n => n.id === currentNoteId);
+                if (noteToTrash) {
+                    noteToTrash.lastModified = new Date(); // Update modified time to reflect deletion
+                    trashedNotes.unshift(noteToTrash); // Add to beginning of trash
+                    notes = notes.filter(n => n.id !== currentNoteId);
+                    
+                    localStorage.setItem('notes', JSON.stringify(notes));
+                    localStorage.setItem('trashedNotes', JSON.stringify(trashedNotes));
+                }
+            }
+            
+            currentNoteId = null; // Clear current note ID
+            loadNotes(searchInput.value); // Reload the current list (either active or trash)
         }
 
         function updateStats() {
@@ -332,8 +391,66 @@ function loadNote(id) {
             wordCount.textContent = `Words: ${words}`;
             charCount.textContent = `Characters: ${text.length}`;
         }
+        
+        // --- NEW HELPER FUNCTIONS ADDED ---
+        function updateEditorUI() {
+            if (isViewingTrash) {
+                // TRASH VIEW
+                noteTitle.disabled = true;
+                notepad.disabled = true;
+                saveStatus.style.display = 'none';
+                downloadNoteBtn.style.display = 'none';
+                restoreNoteBtn.style.display = (currentNoteId ? 'inline-block' : 'none');
+                deleteNoteBtn.innerHTML = '🗑️ Delete Permanently';
+                deleteNoteBtn.title = 'Delete Permanently';
+            } else {
+                // ACTIVE NOTES VIEW
+                noteTitle.disabled = false;
+                notepad.disabled = false;
+                saveStatus.style.display = 'inline';
+                downloadNoteBtn.style.display = 'inline-block';
+                restoreNoteBtn.style.display = 'none';
+                deleteNoteBtn.innerHTML = '🗑️';
+                deleteNoteBtn.title = 'Delete Note';
+            }
+        }
 
-        // Theme
+        function restoreNote() {
+            if (!currentNoteId) return;
+
+            let notes = JSON.parse(localStorage.getItem('notes')) || [];
+            let trashedNotes = JSON.parse(localStorage.getItem('trashedNotes')) || [];
+            
+            const noteToRestore = trashedNotes.find(n => n.id === currentNoteId);
+            if (noteToRestore) {
+                noteToRestore.lastModified = new Date(); // Update modified time
+                notes.unshift(noteToRestore); // Add to beginning of active notes
+                trashedNotes = trashedNotes.filter(n => n.id !== currentNoteId);
+                
+                localStorage.setItem('notes', JSON.stringify(notes));
+                localStorage.setItem('trashedNotes', JSON.stringify(trashedNotes));
+            }
+            
+            currentNoteId = null; // Clear ID
+            loadNotes(searchInput.value); // Reload trash list
+        }
+
+        function toggleTrashView(showTrash) {
+            isViewingTrash = showTrash;
+            currentNoteId = null; // Reset selection
+            
+            viewTrashBtn.style.display = isViewingTrash ? 'none' : 'block';
+            backToNotesBtn.style.display = isViewingTrash ? 'block' : 'none';
+            newNoteBtn.style.display = isViewingTrash ? 'none' : 'flex';
+            
+            // Change header
+            const header = document.querySelector('.sidebar .editor-header h2');
+            header.textContent = isViewingTrash ? 'Trash' : 'My Notes';
+            
+            loadNotes(); // Load the appropriate list
+        }
+
+        // --- Theme ---
         function initializeTheme() {
             const theme = localStorage.getItem('theme') || 'light';
             document.body.classList.toggle('dark-mode', theme === 'dark');
@@ -347,7 +464,7 @@ function loadNote(id) {
             themeSwitch.textContent = isDark ? '☀️' : '🌙';
         });
 
-        // Download note
+        // --- Download note ---
         downloadNoteBtn.addEventListener('click', () => {
             if (!currentNoteId) return alert('No note selected!');
             const title = noteTitle.value || 'Untitled Note';
@@ -358,7 +475,7 @@ function loadNote(id) {
             a.click();
         });
 
-        // Export / Import
+        // --- Export / Import ---
         exportNotesBtn.addEventListener('click', () => {
             const notes = localStorage.getItem('notes');
             const blob = new Blob([notes], { type: 'application/json' });
@@ -381,12 +498,18 @@ function loadNote(id) {
             reader.readAsText(file);
         });
 
-        // Listeners
+        // --- Listeners (MODIFIED) ---
         notepad.addEventListener('input', () => { autoSave(); updateStats(); });
         noteTitle.addEventListener('input', autoSave);
         newNoteBtn.addEventListener('click', createNewNote);
         deleteNoteBtn.addEventListener('click', deleteNote);
         searchInput.addEventListener('input', e => loadNotes(e.target.value));
+
+        // NEW LISTENERS ADDED
+        restoreNoteBtn.addEventListener('click', restoreNote);
+        viewTrashBtn.addEventListener('click', () => toggleTrashView(true));
+        backToNotesBtn.addEventListener('click', () => toggleTrashView(false));
+
 
         initializeTheme();
         loadNotes();
