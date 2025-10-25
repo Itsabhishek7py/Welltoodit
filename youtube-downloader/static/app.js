@@ -54,50 +54,32 @@ function renderInfo(info) {
   `
   table.appendChild(thead)
   
-  // Body
+  // Body (optimized section)
   const tbody = document.createElement('tbody')
-  
-  info.formats.forEach(f => {
-    const tr = document.createElement('tr')
-    
-    // Quality column
-    const qualityTd = document.createElement('td')
-    const qualityDiv = document.createElement('div')
-    qualityDiv.className = 'quality-cell'
-    qualityDiv.innerHTML = `<strong>${f.quality}</strong>`
-    if (f.label) {
-      qualityDiv.innerHTML += `<span class="quality-badge">${f.label}</span>`
-    }
-    qualityTd.appendChild(qualityDiv)
-    
-    // Type column
-    const typeTd = document.createElement('td')
-    const typeSpan = document.createElement('span')
-    typeSpan.className = 'type-badge'
-    if (f.type === 'Audio Only') {
-      typeSpan.className += ' type-audio'
-      typeSpan.innerHTML = '🎵 Audio Only'
-    } else if (f.type === 'Video + Audio') {
-      typeSpan.className += ' type-video-audio'
-      typeSpan.innerHTML = '🎬 Video + Audio'
-    } else {
-      typeSpan.textContent = f.type
-    }
-    typeTd.appendChild(typeSpan)
-    
-    // Download button column
-    const downloadTd = document.createElement('td')
-    const btn = document.createElement('button')
-    btn.className = 'download-btn'
-    btn.innerHTML = '⚡ Download'
-    btn.onclick = () => startDownload(urlInput.value.trim(), f.format_id)
-    downloadTd.appendChild(btn)
-    
-    tr.appendChild(qualityTd)
-    tr.appendChild(typeTd)
-    tr.appendChild(downloadTd)
-    tbody.appendChild(tr)
-  })
+  tbody.innerHTML = info.formats.map(f => `
+    <tr>
+      <td>
+        <div class="quality-cell">
+          <strong>${f.quality}</strong>
+          ${f.label ? `<span class="quality-badge">${f.label}</span>` : ''}
+        </div>
+      </td>
+      <td>
+        <span class="type-badge ${
+          f.type === 'Audio Only' ? 'type-audio' :
+          f.type === 'Video + Audio' ? 'type-video-audio' : ''
+        }">
+          ${f.type === 'Audio Only' ? '🎵 Audio Only' :
+            f.type === 'Video + Audio' ? '🎬 Video + Audio' : f.type}
+        </span>
+      </td>
+      <td>
+        <button class="download-btn" onclick="startDownload('${urlInput.value.trim()}', '${f.format_id}')">
+          ⚡ Download
+        </button>
+      </td>
+    </tr>
+  `).join('')
   
   table.appendChild(tbody)
   formatsTableEl.innerHTML = ''
