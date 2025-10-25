@@ -2,66 +2,113 @@ from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 import numpy as np
 import io
+import cv2
 import easyocr
-import cv2  # <--- Make sure CV2 is imported
+import time
+import logging
+import os
 
+# -------------------------------
+# Flask App Setup
+# -------------------------------
 app = Flask(__name__)
 CORS(app)
 
-# Initialize the EasyOCR reader (same as before)
+# Logging Configuration
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] - %(message)s"
+)
+
+# -------------------------------
+# EasyOCR Reader Initialization
+# -------------------------------
 try:
     reader = easyocr.Reader(['en'], gpu=True)
-    print("EasyOCR reader initialized on GPU.")
-except:
+    logging.info("✅ EasyOCR initialized using GPU.")
+except Exception as e:
     reader = easyocr.Reader(['en'], gpu=False)
-    print("EasyOCR reader initialized on CPU.")
+    logging.warning(f"⚠️ GPU not available, falling back to CPU. Reason: {e}")
 
+# -------------------------------
+# Helper Function: Preprocessing
+# -------------------------------
+def preprocess_image(image_bytes: bytes) -> bytes:
+    """
+    Enhance the image for better OCR results.
+    - Converts to grayscale
+    - Applies CLAHE for contrast enhancement
+    Returns processed image bytes.
+    """
+    nparr = np.frombuffer(image_bytes, np.uint8)
+    img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+    if img is None:
+        raise ValueError("Invalid image file")
+
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    # Contrast enhancement
+    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+    enhanced_gray = clahe.apply(gray)
+
+    _, buffer = cv2.imencode('.png', enhanced_gray)
+    return buffer.tobytes()
+
+# -------------------------------
+# Routes
+# -------------------------------
 @app.route('/')
-def index():
+def home():
+    """Render the homepage."""
     return render_template('index.html')
+
 
 @app.route('/api/ocr', methods=['POST'])
 def ocr_endpoint():
+    """
+    Endpoint: /api/ocr
+    Accepts: image (multipart/form-data)
+    Returns: extracted text in JSON
+    """
+    start_time = time.time()
+
     if 'image' not in request.files:
-        return jsonify({'error': 'no file part named "image"'}), 400
-    
+        return jsonify({'error': 'No file part named "image" found.'}), 400
+
     file = request.files['image']
-    
-    if file.filename == '':
-        return jsonify({'error': 'no selected file'}), 400
-    
+    if not file or file.filename == '':
+        return jsonify({'error': 'No file selected.'}), 400
+
+    # Validate file type
+    allowed_extensions = {'png', 'jpg', 'jpeg', 'bmp', 'tiff'}
+    ext = file.filename.rsplit('.', 1)[-1].lower()
+    if ext not in allowed_extensions:
+        return jsonify({'error': 'Unsupported file type.'}), 400
+
     try:
         image_bytes = file.read()
+        processed_bytes = preprocess_image(image_bytes)
 
-        # --- Gentle Preprocessing for Handwriting ---
-        # 1. Decode the image bytes into a CV2 image
-        nparr = np.frombuffer(image_bytes, np.uint8)
-        img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-        
-        # 2. Convert to grayscale
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        
-        # 3. Apply CLAHE to enhance local contrast
-        clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
-        enhanced_gray = clahe.apply(gray)
-        
-        # 4. Encode the *enhanced* image back into bytes
-        _, buffer = cv2.imencode('.png', enhanced_gray)
-        processed_image_bytes = buffer.tobytes()
-        # --- End of Preprocessing ---
+        # OCR Extraction
+        results = reader.readtext(processed_bytes)
+        extracted_text = "\n".join([res[1] for res in results]).strip()
 
-        # Pass the *new* processed bytes to EasyOCR
-        results = reader.readtext(processed_image_bytes)
-        
-        # Extract just the text
-        text = "\n".join([res[1] for res in results])
-        cleaned = text.strip()
-        
-        return jsonify({'text': cleaned})
-    
+        response_time = round(time.time() - start_time, 2)
+        logging.info(f"OCR processed in {response_time}s")
+
+        return jsonify({
+            'text': extracted_text,
+            'processing_time': f"{response_time}s"
+        }), 200
+
     except Exception as e:
-        print(f"Error during OCR: {e}")
-        return jsonify({'error': str(e)}), 500
+        logging.error(f"OCR Processing Error: {e}")
+        return jsonify({'error': f"OCR failed: {str(e)}"}), 500
 
+# -------------------------------
+# Main Entrypoint
+# -------------------------------
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    port = int(os.environ.get("PORT", 5000))
+    logging.info(f"🚀 Starting Flask server on port {port}...")
+    app.run(debug=True, host='0.0.0.0', port=port)
