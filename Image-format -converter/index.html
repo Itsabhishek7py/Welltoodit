@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Converter</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Inter font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* Apply Inter font */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        /* Custom styles for file input */
+        .file-input-label {
+            transition: all 0.3s ease;
+        }
+        .file-input-label:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(168, 85, 247, 0.3); /* Violet shadow */
+        }
+        
+        /* Custom focus styles for better accessibility and theme matching */
+        select:focus, button:focus {
+            outline: 2px solid #ec4899; /* Pink outline */
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body class="bg-black text-violet-100 min-h-screen flex items-center justify-center p-4">
+
+    <div class="bg-zinc-900 p-8 rounded-2xl shadow-2xl w-full max-w-lg border border-zinc-800">
+        <!-- Header -->
+        <h1 class="text-3xl font-bold text-center mb-2 text-pink-300">
+            Image Converter
+        </h1>
+        <p class="text-center text-violet-300 mb-8">
+            Convert your images to any format, entirely in your browser.
+        </p>
+
+        <div class="space-y-6">
+            <!-- Step 1: File Upload -->
+            <div>
+                <label for="fileInput" class="file-input-label block w-full text-center px-6 py-4 bg-violet-700 text-white rounded-lg cursor-pointer font-medium hover:bg-violet-600">
+                    <span id="fileInputText">1. Upload Image</span>
+                </label>
+                <input type="file" id="fileInput" class="hidden" accept="image/*">
+            </div>
+
+            <!-- Image Preview -->
+            <div id="previewContainer" class="hidden">
+                <img id="imagePreview" src="" alt="Image Preview" class="rounded-lg max-h-60 w-auto mx-auto border-2 border-zinc-700">
+            </div>
+
+            <!-- Step 2: Select Format -->
+            <div>
+                <label for="formatSelect" class="block text-sm font-medium text-violet-200 mb-2">2. Select Target Format</label>
+                <select id="formatSelect" class="w-full bg-zinc-800 border border-zinc-700 text-white rounded-lg p-3 focus:ring-pink-500 focus:border-pink-500">
+                    <option value="png">PNG</option>
+                    <option value="jpeg">JPEG</option>
+                    <option value="webp">WEBP</option>
+                    <option value="bmp">BMP</option>
+                    <option value="gif">GIF</option>
+                </select>
+            </div>
+
+            <!-- Step 3: Convert Button -->
+            <button id="convertBtn" class="w-full py-3 bg-pink-600 text-white font-bold rounded-lg hover:bg-pink-500 transition-colors disabled:bg-zinc-700 disabled:text-zinc-400 disabled:cursor-not-allowed shadow-lg hover:shadow-pink-500/30" disabled>
+                3. Convert
+            </button>
+            
+            <!-- Message Area -->
+            <p id="messageArea" class="text-center text-sm h-5"></p>
+
+            <!-- Step 4: Download Link -->
+            <a id="downloadLink" class="hidden w-full text-center px-6 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-500 transition-colors" href="#" download="converted-image.png">
+                Download Converted Image
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Get DOM elements
+        const fileInput = document.getElementById('fileInput');
+        const fileInputText = document.getElementById('fileInputText');
+        const previewContainer = document.getElementById('previewContainer');
+        const imagePreview = document.getElementById('imagePreview');
+        const formatSelect = document.getElementById('formatSelect');
+        const convertBtn = document.getElementById('convertBtn');
+        const messageArea = document.getElementById('messageArea');
+        const downloadLink = document.getElementById('downloadLink');
+
+        // Store file data
+        let originalFile = null;
+        let originalFileName = '';
+        let originalFileUrl = null;
+
+        // Listen for file input changes
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) {
+                resetUI();
+                return;
+            }
+            
+            if (!file.type.startsWith('image/')) {
+                showMessage('Error: Please upload an image file.', 'error');
+                resetUI();
+                return;
+            }
+
+            originalFile = file;
+            originalFileName = file.name;
+
+            // Clean up previous object URL
+            if (originalFileUrl) {
+                URL.revokeObjectURL(originalFileUrl);
+            }
+            
+            // Create a URL for the file to preview it
+            originalFileUrl = URL.createObjectURL(file);
+            imagePreview.src = originalFileUrl;
+            previewContainer.classList.remove('hidden');
+            
+            // Update UI
+            fileInputText.textContent = `File: ${originalFileName}`;
+            convertBtn.disabled = false;
+            downloadLink.classList.add('hidden');
+            showMessage('', 'info'); // Clear message
+        });
+
+        // Listen for convert button click
+        convertBtn.addEventListener('click', () => {
+            if (!originalFile) {
+                showMessage('Error: No file selected.', 'error');
+                return;
+            }
+
+            showMessage('Converting... please wait.', 'info');
+            convertBtn.disabled = true;
+
+            const targetFormat = formatSelect.value;
+            const reader = new FileReader();
+
+            // Read the file as a data URL
+            reader.readAsDataURL(originalFile);
+
+            reader.onload = (e) => {
+                const img = new Image();
+                img.src = e.target.result;
+
+                img.onload = () => {
+                    // Create canvas
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    // Set canvas dimensions
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    
+                    // Draw image
+                    // For formats that don't support transparency (like JPEG, BMP), fill bg with white
+                    if (targetFormat === 'jpeg' || targetFormat === 'bmp') {
+                        ctx.fillStyle = '#FFFFFF';
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    }
+                    ctx.drawImage(img, 0, 0);
+
+                    try {
+                        // Convert canvas to target format
+                        const mimeType = `image/${targetFormat}`;
+                        const convertedDataUrl = canvas.toDataURL(mimeType, 1.0); // 1.0 for quality
+
+                        // Set up download link
+                        const newFileName = `${originalFileName.split('.').slice(0, -1).join('.')}.${targetFormat}`;
+                        downloadLink.href = convertedDataUrl;
+                        downloadLink.download = newFileName;
+                        
+                        // Update UI
+                        downloadLink.classList.remove('hidden');
+                        showMessage('Conversion successful! Ready to download.', 'success');
+                        
+                    } catch (error) {
+                        console.error('Conversion Error:', error);
+                        showMessage(`Error: Could not convert to ${targetFormat}.`, 'error');
+                    } finally {
+                        convertBtn.disabled = false;
+                    }
+                };
+
+                img.onerror = () => {
+                    showMessage('Error: Could not load the image file.', 'error');
+                    convertBtn.disabled = false;
+                };
+            };
+
+            reader.onerror = () => {
+                showMessage('Error: Could not read the file.', 'error');
+                convertBtn.disabled = false;
+            };
+        });
+
+        // Helper to reset the UI
+        function resetUI() {
+            originalFile = null;
+            originalFileName = '';
+            if (originalFileUrl) {
+                URL.revokeObjectURL(originalFileUrl);
+                originalFileUrl = null;
+            }
+            fileInput.value = null; // Clear the file input
+            fileInputText.textContent = '1. Upload Image';
+            previewContainer.classList.add('hidden');
+            imagePreview.src = '';
+            convertBtn.disabled = true;
+            downloadLink.classList.add('hidden');
+            showMessage('', 'info');
+        }
+
+        // Helper to show messages
+        function showMessage(message, type) {
+            messageArea.textContent = message;
+            if (type === 'error') {
+                messageArea.className = 'text-center text-sm h-5 text-red-400';
+            } else if (type === 'success') {
+                messageArea.className = 'text-center text-sm h-5 text-green-400';
+            } else {
+                messageArea.className = 'text-center text-sm h-5 text-violet-300';
+            }
+        }
+    </script>
+</body>
+</html>
