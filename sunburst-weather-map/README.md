@@ -42,16 +42,12 @@ This project is a single index.html file and requires no build step or installat
 
 Download: Save the index.html file to your local machine.
 
-Get an API Key: This app requires a free API key from OpenWeatherMap.org. Sign up on their website to get your key.
-
 Open: Open the index.html file in any modern web browser (e.g., Chrome, Firefox, Safari).
 
-How to Use
-
-Enter API Key: When the app first loads, you will see a form asking for your API key. Paste your key from OpenWeatherMap into the input field and click "Save". You only need to do this once per session.
+How to Use:
 
 Search Location: Enter the name of a city (e.g., "Tokyo", "New York") or country in the main search bar.
 
 Get Weather: Click the "Search" button or press Enter.
 
-View Results: The app will display a loading indicator, followed by the complete weather card for your selected location. If the city isn't found or the API key is wrong, a clear error message will be shown.
+View Results: The app will display a loading indicator, followed by the complete weather card for your selected location.
